@@ -5,138 +5,128 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { fetchSuppliers } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
+import useModal from "../../hooks/useModal";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const SupplierMaster = () => {
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 1,
-      code: "SUP001",
-      name: "Toyota East Africa Ltd",
-      type: "OEM Manufacturer",
-    },
-    {
-      id: 2,
-      code: "SUP002",
-      name: "Global Auto Parts",
-      type: "Wholesaler",
-    },
-    {
-      id: 3,
-      code: "SUP003",
-      name: "Performance Parts Ltd",
-      type: "Specialty Supplier",
-    },
-    {
-      id: 4,
-      code: "SUP004",
-      name: "Continental Tire & Rubber",
-      type: "Manufacturer",
-    },
-    {
-      id: 5,
-      code: "SUP005",
-      name: "East Africa Lubricants",
-      type: "Manufacturer",
-    },
-    {
-      id: 6,
-      code: "SUP006",
-      name: "Nippon Auto Electricals",
-      type: "Importer",
-    },
-    {
-      id: 7,
-      code: "SUP007",
-      name: "African Truck Spares",
-      type: "Specialized Dealer",
-    },
-    {
-      id: 8,
-      code: "SUP008",
-      name: "Victoria Batteries & Parts",
-      type: "Wholesaler",
+  const [suppliers, setSuppliers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchSuppliers(searchQuery);
+        const validData = data.filter(
+          (item) => item.supplierCode && item.supplierName
+        )
+        setSuppliers(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch suppliers");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+    fetchData();
+  }, [searchQuery]);
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  }
 
-  const handleAction = (action, supplier) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", supplier);
-        break;
-      case "edit":
-        console.log("Edit:", supplier);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${supplier.name}?`)) {
-          setSuppliers(suppliers.filter((c) => c.id !== supplier.id));
-        }
-        break;
-      default:
-        break;
-    }
-  };
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null)
+
+  const handleAdd = (newSupplier) => {
+    setSuppliers([...suppliers, { ...newSupplier, id: Date.now() }])
+    addModal.closeModal();
+  }
+
+  const handleEdit = (updatedSupplier) => {
+    setSuppliers(
+      suppliers.map((supplier) => (
+        supplier.id === updatedSupplier.id ? updatedSupplier : supplier
+      ))
+    );
+    editModal.closeModal();
+  }
+
+  const handleDelete = () => {
+    setSuppliers(
+      suppliers.filter((supplier) => supplier.id !== deleteModal.modalData.id)
+    )
+  }
 
   const columns = [
     {
-      key: "code",
+      key: "supplierCode",
       header: "Supplier Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.supplierCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "supplierName",
       header: "Supplier Name",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => <span className="text-gray-800">{item.supplierName}</span>,
     },
     {
-      key: "type",
+      key: "supplierType",
       header: "Type",
-      render: (item) => <span className="text-gray-600">{item.type}</span>,
+      render: (item) => <span className="text-gray-600">{item.supplierType}</span>,
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -172,7 +162,9 @@ const SupplierMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              onClick={() => addModal.openModal()}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Supplier
             </button>
@@ -186,6 +178,8 @@ const SupplierMaster = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search suppliers..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -193,14 +187,59 @@ const SupplierMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={suppliers}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {
+          loading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading suppliers...</p>
+            </div>
+          )
+            : error ? (
+              <div className="p-8 text-center">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : (
+              <Table
+                data={suppliers}
+                columns={columns}
+                currentPage={1}
+                totalPages={2}
+                onPageChange={(page) => console.log(`Page changed to ${page}`)}
+              />
+            )
+        }
       </div>
+
+      <AddModal
+        recordType="supplier"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="supplier"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="supplier"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="supplier"
+        identifier={deleteModal.modalData?.supplierName || ""}
+      />
+
     </div>
   );
 };

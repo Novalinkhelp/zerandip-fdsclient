@@ -5,141 +5,89 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { fetchCompanies } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
+import useModal from "../../hooks/useModal";
 import Table from "../../components/table/Table";
-import Modal from "../../components/shared/Modal";
-import { companyMasterConfig } from "../../config/formFieldsConfig";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const CompanyMaster = () => {
-  const [companies, setCompanies] = useState([
-    {
-      id: 1,
-      code: "COMP001",
-      name: "Zerendib Holdings",
-      address: "123 Business Rd, Nairobi, Kenya",
-      email: "info@zerendib.com",
-    },
-    {
-      id: 2,
-      code: "COMP002",
-      name: "Zerendib Retail",
-      address: "456 Market St, Nairobi, Kenya",
-      email: "retail@zerendib.com",
-    },
-    {
-      id: 3,
-      code: "COMP003",
-      name: "Zerendib Technologies",
-      address: "789 Tech Park, Mombasa, Kenya",
-      email: "tech@zerendib.com",
-    },
-    {
-      id: 4,
-      code: "COMP004",
-      name: "East Africa Logistics",
-      address: "234 Harbor Rd, Dar es Salaam, Tanzania",
-      email: "logistics@eastafrica.com",
-    },
-    {
-      id: 5,
-      code: "COMP005",
-      name: "Savanna Investments",
-      address: "567 Finance Blvd, Kampala, Uganda",
-      email: "invest@savanna.com",
-    },
-    {
-      id: 6,
-      code: "COMP006",
-      name: "Kilimanjaro Foods",
-      address: "890 Farm Lane, Arusha, Tanzania",
-      email: "food@kilimanjaro.com",
-    },
-    {
-      id: 7,
-      code: "COMP007",
-      name: "Serengeti Tours",
-      address: "123 Safari Ave, Kigali, Rwanda",
-      email: "tours@serengeti.com",
-    },
-    {
-      id: 8,
-      code: "COMP008",
-      name: "Victoria Textiles",
-      address: "456 Cotton St, Kisumu, Kenya",
-      email: "textiles@victoria.com",
-    },
-  ]);
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    mode: "create", // 'create' | 'edit' | 'view'
-    data: {},
-  });
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchCompanies(searchQuery);
+        const validData = data.filter(
+          (item) => item.companyCode && item.companyName
+        );
+        setCompanies(validData);
+        setError(null);
+      } catch (err) {
+        setError("Failed to fetch companies");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleCreate = () => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "create",
-      data: {},
-    });
+    fetchData();
+  }, [searchQuery]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
 
-  const handleView = (company) => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "view",
-      data: company,
-    });
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
+
+  const handleAdd = (newCompany) => {
+    setCompanies([...companies, { ...newCompany, id: Date.now() }]);
+    addModal.closeModal();
   };
 
-  const handleEdit = (company) => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "edit",
-      data: company,
-    });
+  const handleEdit = (updatedCompany) => {
+    setCompanies(
+      companies.map((company) =>
+        company.id === updatedCompany.id ? updatedCompany : company
+      )
+    );
+    editModal.closeModal();
   };
 
-  const handleDelete = (company) => {
-    closeAllDropdowns();
-    if (window.confirm(`Delete ${company.name}?`)) {
-      setCompanies(companies.filter((c) => c.id !== company.id));
-    }
-  };
-
-  const handleSubmit = (formData) => {
-    closeAllDropdowns();
-    if (modalState.mode === "create") {
-      // Add new company
-      setCompanies([...companies, { ...formData, id: Date.now() }]);
-    } else {
-      // Update existing company
-      setCompanies(
-        companies.map((c) =>
-          c.id === modalState.data.id ? { ...c, ...formData } : c
-        )
-      );
-    }
+  const handleDelete = () => {
+    setCompanies(
+      companies.filter((company) => company.id !== deleteModal.modalData.id)
+    );
+    deleteModal.closeModal();
   };
 
   const columns = [
     {
-      key: "code",
+      key: "companyCode",
       header: "Company Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.companyCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "companyName",
       header: "Company Name",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.companyName}</span>
+      ),
     },
     {
       key: "address",
@@ -153,20 +101,20 @@ const CompanyMaster = () => {
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
                 index >= data.length - 2 ? "bottom-full" : "top-full"
@@ -174,20 +122,20 @@ const CompanyMaster = () => {
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleView(item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleEdit(item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleDelete(item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -219,13 +167,13 @@ const CompanyMaster = () => {
             </div>
           </div>
           <div className="flex gap-3 flex-col xs:flex-row items-start xs:items-center max-xs:w-full">
-            <button className="flex items- justify-center max-xs:w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
+            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
             <button
               className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
-              onClick={handleCreate}
+              onClick={() => addModal.openModal()}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add New Company
@@ -240,6 +188,8 @@ const CompanyMaster = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search companies..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -247,23 +197,55 @@ const CompanyMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={companies}
-          columns={columns}
-          currentPage={1}
-          totalPages={10}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading companies...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={companies}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
 
-      <Modal
-        title={companyMasterConfig.title}
-        isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
-        mode={modalState.mode}
-        initialData={modalState.data}
-        tabs={companyMasterConfig.tabs}
-        onSubmit={handleSubmit}
+      {/* Modals */}
+      <AddModal
+        recordType="company"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="company"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="company"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="company"
+        identifier={deleteModal.modalData?.companyName || ""}
       />
     </div>
   );

@@ -5,146 +5,85 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { useEffect, useState } from "react";
+import { fetchUtilities } from "../../utils/mockApi";
 import Table from "../../components/table/Table";
-import Modal from "../../components/shared/Modal";
-import { utilityMasterConfig } from "../../config/formFieldsConfig";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const UtilityMaster = () => {
-  const [utilities, setUtilities] = useState([
-    {
-      id: 1,
-      code: "UTIL001",
-      reference: "EL-2025-001",
-      description: "Electricity Bill - Main Office",
-      period: "Jan 2025",
-      amount: "KES 75,000"
-    },
-    {
-      id: 2,
-      code: "UTIL002",
-      reference: "WT-2025-003",
-      description: "Water Utilities - Nairobi Branch",
-      period: "Jan 2025",
-      amount: "KES 12,500"
-    },
-    {
-      id: 3,
-      code: "UTIL003",
-      reference: "IN-2025-007",
-      description: "Internet Services - All Branches",
-      period: "Jan 2025",
-      amount: "KES 45,000"
-    },
-    {
-      id: 4,
-      code: "UTIL004",
-      reference: "EL-2025-010",
-      description: "Electricity Bill - Mombasa Branch",
-      period: "Jan 2025",
-      amount: "KES 28,000"
-    },
-    {
-      id: 5,
-      code: "UTIL005",
-      reference: "PH-2025-015",
-      description: "Phone Services - Corporate",
-      period: "Jan 2025",
-      amount: "KES 18,500"
-    },
-    {
-      id: 6,
-      code: "UTIL006",
-      reference: "SE-2025-018",
-      description: "Security Services - All Locations",
-      period: "Jan 2025",
-      amount: "KES 120,000"
-    },
-    {
-      id: 7,
-      code: "UTIL007",
-      reference: "WT-2025-020",
-      description: "Water Utilities - Kampala Office",
-      period: "Jan 2025",
-      amount: "UGX 1,200,000"
-    },
-    {
-      id: 8,
-      code: "UTIL008",
-      reference: "GN-2025-025",
-      description: "Generator Fuel - Dar es Salaam",
-      period: "Jan 2025",
-      amount: "TZS 850,000"
+  const [utilities, setUtilities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchUtilities(searchQuery);
+        const validData = data.filter(
+          (utility) => utility.expenseReferenceNumber && utility.expenseCode
+        )
+        setUtilities(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch utilities");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    mode: "create",
-    data: {}
-  });
+    fetchData();
+  }, [searchQuery])
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
-  const handleCreate = () => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "create",
-      data: {}
-    });
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   }
 
-  const handleView = (utility) => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "view",
-      data: utility
-    });
+  const handleAdd = (newUtility) => {
+    setUtilities([...utilities, { ...newUtility, id: Date.now() }]);
+    addModal.closeModal();
   }
 
-  const handleEdit = (utility) => {
-    closeAllDropdowns();
-    setModalState({
-      isOpen: true,
-      mode: "edit",
-      data: utility
-    })
+  const handleEdit = (updatedUtility) => {
+    setUtilities(
+      utilities.map((utility) =>
+        utility.id === updatedUtility.id ? updatedUtility : utility
+      ))
+    editModal.closeModal();
   }
 
-  const handleDelete = (utility) => {
-    closeAllDropdowns();
-    if (window.confirm(`Delete ${utility.code} - ${utility.description}?`)) {
-      setUtilities(utilities.filter((u) => u.id !== utility.id));
-    }
+  const handleDelete = () => {
+    setUtilities(utilities.filter((utility) => utility.id !== deleteModal.modalData.id))
+    deleteModal.closeModal();
   }
 
-  const handleSubmit = (formData) => {
-    closeAllDropdowns();
-    if (modalState.mode === "create") {
-      setUtilities([...utilities, { ...formData, id: Date.now() }])
-    } else {
-      setUtilities(
-        utilities.map((utility) =>
-          utility.id === modalState.data.id ? { ...utility, ...formData } : utility)
-      );
-    }
-  }
 
   const columns = [
     {
-      key: "code",
+      key: "expenseCode",
       header: "Expenses Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.expenseCode}</span>
       ),
     },
     {
-      key: "reference",
+      key: "expenseReferenceNumber",
       header: "Expense Reference No",
-      render: (item) => <span className="text-gray-800">{item.reference}</span>,
+      render: (item) => <span className="text-gray-800">{item.expenseReferenceNumber}</span>,
     },
     {
       key: "description",
@@ -163,40 +102,40 @@ const UtilityMaster = () => {
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleView(item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleEdit(item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleDelete(item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -234,7 +173,7 @@ const UtilityMaster = () => {
             </button>
             <button
               className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
-              onClick={handleCreate}
+              onClick={() => addModal.openModal()}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add New Utility
@@ -249,30 +188,64 @@ const UtilityMaster = () => {
           </div>
           <input
             type="text"
-            placeholder="Search utility..."
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search utilities..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={utilities}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading utilities...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={utilities}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
 
-      <Modal
-        title={utilityMasterConfig.title}
-        isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
-        mode={modalState.mode}
-        initialData={modalState.data}
-        tabs={utilityMasterConfig.tabs}
-        onSubmit={handleSubmit}
+      {/* Modals */}
+      <AddModal
+        recordType="utility"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="utility"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="utility"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="utility"
+        identifier={deleteModal.modalData?.description || ""}
       />
     </div>
   );

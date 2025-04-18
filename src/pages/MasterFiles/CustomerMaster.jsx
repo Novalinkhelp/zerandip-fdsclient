@@ -5,120 +5,90 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { fetchCustomers } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const CustomerMaster = () => {
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      code: "CUST001",
-      name: "Simba Auto Parts Ltd",
-      type: "Corporate",
-      contactNo: "+254-20-5551234",
-      status: "Active",
-      address: "123 Moi Avenue, Nairobi, Kenya",
-    },
-    {
-      id: 2,
-      code: "CUST002",
-      name: "Motorway Garage",
-      type: "Dealer",
-      contactNo: "+254-732-1234567",
-      status: "Active",
-      address: "456 Uhuru Highway, Nairobi, Kenya",
-    },
-    {
-      id: 3,
-      code: "CUST003",
-      name: "Safari Fleet Services",
-      type: "Corporate",
-      contactNo: "+254-20-3334455",
-      status: "Active",
-      address: "789 Mombasa Road, Mombasa, Kenya",
-    },
-    {
-      id: 4,
-      code: "CUST004",
-      name: "Mwananchi Mechanics",
-      type: "Retail",
-      contactNo: "+255-65-8889900",
-      status: "Inactive",
-      address: "234 Uhuru Street, Dar es Salaam, Tanzania",
-    },
-    {
-      id: 5,
-      code: "CUST005",
-      name: "Pearl Auto Centre",
-      type: "Dealer",
-      contactNo: "+256-41-7778899",
-      status: "Active",
-      address: "567 Kampala Road, Kampala, Uganda",
-    },
-    {
-      id: 6,
-      code: "CUST006",
-      name: "Mountain Motors Ltd",
-      type: "Corporate",
-      contactNo: "+255-73-5566777",
-      status: "Active",
-      address: "890 Arusha Highway, Arusha, Tanzania",
-    },
-    {
-      id: 7,
-      code: "CUST007",
-      name: "Kigali Auto Spares",
-      type: "Dealer",
-      contactNo: "+250-78-8899000",
-      status: "Active",
-      address: "123 KG Avenue, Kigali, Rwanda",
-    },
-    {
-      id: 8,
-      code: "CUST008",
-      name: "Lakeside Motors",
-      type: "Retail",
-      contactNo: "+254-57-2023456",
-      status: "Active",
-      address: "456 Oginga Odinga St, Kisumu, Kenya",
-    }
-  ]);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchCustomers(searchQuery);
+        const validData = data.filter(
+          (data) => data.customerCode && data.customerName
+        );
+        setCustomers(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch customers");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleAction = (action, customer) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", customer);
-        break;
-      case "edit":
-        console.log("Edit:", customer);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${customer.name}?`)) {
-          setCustomers(customers.filter((c) => c.id !== customer.id));
-        }
-        break;
-      default:
-        break;
-    }
+    fetchData();
+  }, [searchQuery]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  const closeAllDropdowns = () => setOpenDropdownId(null);
+
+  const handleAdd = (newCustomer) => {
+    setCustomers([...customers, { ...newCustomer, id: Date.now() }]);
+    addModal.closeModal();
+  };
+
+  const handleEdit = (updatedCustomer) => {
+    setCustomers(
+      customers.map((customer) =>
+        customer.id === updatedCustomer.id ? updatedCustomer : customer
+      )
+    );
+    editModal.closeModal();
+  };
+
+  const handleDelete = () => {
+    setCustomers(
+      customers.filter((customer) => customer.id !== deleteModal.modalData.id)
+    );
+    deleteModal.closeModal();
   };
 
   const columns = [
     {
-      key: "code",
+      key: "customerCode",
       header: "Customer Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.customerCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "customerName",
       header: "Customer Name",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.customerName}</span>
+      ),
     },
     {
       key: "type",
@@ -126,9 +96,9 @@ const CustomerMaster = () => {
       render: (item) => <span className="text-gray-600">{item.type}</span>,
     },
     {
-      key: "contact",
+      key: "telephone",
       header: "Contact Number",
-      render: (item) => <span className="text-gray-600">{item.contactNo}</span>,
+      render: (item) => <span className="text-gray-600">{item.telephone}</span>,
     },
     {
       key: "status",
@@ -137,40 +107,41 @@ const CustomerMaster = () => {
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -206,7 +177,10 @@ const CustomerMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button
+              onClick={() => addModal.openModal()}
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Customer
             </button>
@@ -220,6 +194,8 @@ const CustomerMaster = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search customers..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -227,14 +203,58 @@ const CustomerMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={customers}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading customers...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center ">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={customers}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
+
+      <AddModal
+        recordType="customer"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+        width="max-w-7xl"
+      />
+
+      <ViewModal
+        recordType="customer"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+        width="max-w-7xl"
+      />
+
+      <EditModal
+        recordType="customer"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+        width="max-w-7xl"
+      />
+
+      <DeleteModal
+        recordName="customer"
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        identifier={deleteModal.modalData?.customerName || ""}
+      />
     </div>
   );
 };

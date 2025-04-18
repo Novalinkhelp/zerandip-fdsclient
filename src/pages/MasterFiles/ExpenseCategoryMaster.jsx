@@ -5,125 +5,124 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { fetchExpenseCategories } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const ExpenseCategoryMaster = () => {
-  const [expenseCategories, setExpenseCategories] = useState([
-    {
-      id: 1,
-      code: "EXP001",
-      name: "Vehicle Maintenance & Repairs"
-    },
-    {
-      id: 2,
-      code: "EXP002",
-      name: "Office Rent & Utilities"
-    },
-    {
-      id: 3,
-      code: "EXP003",
-      name: "Employee Salaries & Benefits"
-    },
-    {
-      id: 4,
-      code: "EXP004",
-      name: "Travel & Transportation"
-    },
-    {
-      id: 5,
-      code: "EXP005",
-      name: "Marketing & Advertising"
-    },
-    {
-      id: 6,
-      code: "EXP006",
-      name: "IT & Communication"
-    },
-    {
-      id: 7,
-      code: "EXP007",
-      name: "Inventory & Storage Costs"
-    },
-    {
-      id: 8,
-      code: "EXP008",
-      name: "Training & Professional Development"
+  const [expenseCategories, setExpenseCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchExpenseCategories(searchQuery);
+        const validData = data.filter(
+          (expenseCat) => expenseCat.expenseCategoryCode && expenseCat.expenseCategoryName
+        );
+        setExpenseCategories(validData);
+        setError(null);
+      } catch (err) {
+        setError("Failed to fetch expense categories");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+    fetchData();
+  }, [searchQuery])
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
-  const handleAction = (action, expenseCategory) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", expenseCategory);
-        break;
-      case "edit":
-        console.log("Edit:", expenseCategory);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${expenseCategory.name}?`)) {
-          setExpenseCategories(expenseCategories.filter((c) => c.id !== expenseCategory.id));
-        }
-        break;
-      default:
-        break;
-    }
-  };
+  const handleChange = (e) => {
+    setSearchQuery(e.target.value);
+  }
+
+  const handleAdd = (newExpenseCategory) => {
+    setExpenseCategories([...expenseCategories, { ...newExpenseCategory, id: Date.now() }]);
+    addModal.closeModal();
+  }
+
+  const handleEdit = (updatedExpenseCategory) => {
+    setExpenseCategories(
+      expenseCategories.map((expenseCategory) =>
+        expenseCategory.id === updatedExpenseCategory.id ? updatedExpenseCategory : expenseCategory
+      )
+    );
+    editModal.closeModal();
+  }
+
+  const handleDelete = () => {
+    setExpenseCategories(
+      expenseCategories.filter((expenseCategory) => expenseCategory.id !== deleteModal.modalData?.id)
+    );
+    deleteModal.closeModal();
+  }
 
   const columns = [
     {
-      key: "code",
+      key: "expenseCategoryCode",
       header: "Expense Category Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.expenseCategoryCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "expenseCategoryName",
       header: "Expense Category Description",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => <span className="text-gray-800">{item.expenseCategoryName}</span>,
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -159,7 +158,10 @@ const ExpenseCategoryMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              onClick={() => addModal.openModal()}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Expenses Category
             </button>
@@ -173,21 +175,65 @@ const ExpenseCategoryMaster = () => {
           </div>
           <input
             type="text"
-            placeholder="Search expense category..."
+            value={searchQuery}
+            onChange={handleChange}
+            placeholder="Search expense categories..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={expenseCategories}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading expense categories...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={expenseCategories}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
+
+      {/* Modals */}
+      <AddModal
+        recordType="expenseCategory"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="expenseCategory"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="expenseCategory"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="expenseCategory"
+        identifier={deleteModal.modalData?.expenseCategoryName || ""}
+      />
     </div>
   );
 };

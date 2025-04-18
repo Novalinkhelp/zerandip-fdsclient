@@ -5,201 +5,137 @@ import {
     Search,
     EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { useEffect, useState } from "react";
+import { fetchBanks } from "../../utils/mockApi";
 import Table from "../../components/table/Table";
-import Modal from "../../components/shared/Modal";
-import { bankMasterConfig } from "../../config/formFieldsConfig";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const BankMaster = () => {
-    const [banks, setBanks] = useState([
-        {
-            id: 1,
-            code: "BANK001",
-            name: "Equity Bank",
-            branchCode: "EQT-NBO",
-            branchName: "Nairobi Main",
-            city: "Nairobi",
-        },
-        {
-            id: 2,
-            code: "BANK002",
-            name: "KCB Bank",
-            branchCode: "KCB-MSA",
-            branchName: "Mombasa Downtown",
-            city: "Mombasa",
-        },
-        {
-            id: 3,
-            code: "BANK003",
-            name: "Co-operative Bank",
-            branchCode: "COOP-WES",
-            branchName: "Westlands",
-            city: "Nairobi",
-        },
-        {
-            id: 4,
-            code: "BANK004",
-            name: "Stanbic Bank",
-            branchCode: "STB-KLA",
-            branchName: "Kampala Central",
-            city: "Kampala",
-        },
-        {
-            id: 5,
-            code: "BANK005",
-            name: "CRDB Bank",
-            branchCode: "CRDB-DSM",
-            branchName: "Dar es Salaam Main",
-            city: "Dar es Salaam",
-        },
-        {
-            id: 6,
-            code: "BANK006",
-            name: "Bank of Kigali",
-            branchCode: "BOK-KGL",
-            branchName: "Kigali Heights",
-            city: "Kigali",
-        },
-        {
-            id: 7,
-            code: "BANK007",
-            name: "DTB Bank",
-            branchCode: "DTB-MSA",
-            branchName: "Mombasa Road",
-            city: "Nairobi",
-        },
-        {
-            id: 8,
-            code: "BANK008",
-            name: "I&M Bank",
-            branchCode: "IMB-PKD",
-            branchName: "Parklands",
-            city: "Nairobi",
-        },
-    ]);
+    const [banks, setBanks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [modalState, setModalState] = useState({
-        isOpen: false,
-        mode: "create",
-        data: {}
-    })
+    const addModal = useModal();
+    const viewModal = useModal();
+    const editModal = useModal();
+    const deleteModal = useModal();
 
-    const closeAllDropdowns = () => setActiveDropdown(null);
-
-    const handleCreate = () => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "create",
-            data: {}
-        })
-    }
-
-    const handleView = (bank) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "view",
-            data: bank
-        })
-    }
-
-    const handleEdit = (bank) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "edit",
-            data: bank
-        })
-    }
-
-    const handleDelete = (bank) => {
-        closeAllDropdowns();
-        if (window.confirm(`Delete ${bank.name}?`)) {
-            setBanks(banks.filter((b) => b.id !== bank.id))
-        }
-    }
-
-    const handleSubmit = (formData) => {
-        closeAllDropdowns();
-        if (modalState.mode === "create") {
-            setBanks([...banks, { ...formData, id: Date.now() }])
-        } else {
-            setBanks(
-                banks.map(
-                    (b) => b.id === modalState.data.id ? { ...b, ...formData } : b
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchBanks(searchQuery);
+                const validData = data.filter(
+                    (bank) => bank.bankCode && bank.bankName
                 )
-            )
+                setBanks(validData);
+                setError(null);
+            } catch (error) {
+                setError("Failed to fetch banks");
+                console.error("Error:", error);
+            } finally {
+                setLoading(false);
+            }
         }
+
+        fetchData();
+    }, [searchQuery]);
+
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const closeAllDropdowns = () => setOpenDropdownId(null);
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    }
+
+    const handleAdd = (newBank) => {
+        setBanks([...banks, { ...newBank, id: Date.now() }]);
+        addModal.closeModal();
+    }
+
+    const handleEdit = (updatedBank) => {
+        setBanks((banks) =>
+            banks.map((bank) => bank.id === updatedBank.id ? updatedBank : bank)
+        );
+        editModal.closeModal();
+    }
+
+    const handleDelete = () => {
+        setBanks(banks.filter((bank) => bank.id !== deleteModal.modalData.id))
+        deleteModal.closeModal();
     }
 
     const columns = [
         {
-            key: "code",
+            key: "bankCode",
             header: "Bank Code",
             render: (item) => (
-                <span className="font-medium text-gray-900">{item.code}</span>
+                <span className="font-medium text-gray-900">{item.bankCode}</span>
             ),
         },
         {
-            key: "name",
+            key: "bankName",
             header: "Bank Name",
-            render: (item) => <span className="text-gray-800">{item.name}</span>,
+            render: (item) => <span className="text-gray-800">{item.bankName}</span>,
         },
         {
-            key: "branch-code",
+            key: "branchCode",
             header: "Branch Code",
             render: (item) => (
                 <span className="text-gray-600">{item.branchCode}</span>
             ),
         },
         {
-            key: "branch-name",
+            key: "branchName",
             header: "Branch Name",
             render: (item) => <span className="text-gray-600">{item.branchName}</span>,
         },
         {
-            key: "city",
-            header: "City",
-            render: (item) => <span className="text-gray-600">{item.city}</span>,
+            key: "address",
+            header: "Address",
+            render: (item) => <span className="text-gray-600">{item.address}</span>,
         },
         {
             key: "actions",
-            header: "",
+            header: "Actions",
             render: (item, index, data) => (
                 <div className="relative">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            setActiveDropdown(activeDropdown === item.id ? null : item.id);
+                            setOpenDropdownId(openDropdownId === item.id ? null : item.id);
                         }}
                         className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
                         <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
                     </button>
 
-                    {activeDropdown === item.id && (
+                    {openDropdownId === item.id && (
                         <div
                             className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                                 }`}
                         >
                             <div className="p-1">
                                 <button
-                                    onClick={() => handleView(item)}
+                                    onClick={() => viewModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">View Details</span>
                                 </button>
                                 <button
-                                    onClick={() => handleEdit(item)}
+                                    onClick={() => editModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Edit</span>
                                 </button>
                                 <div className="my-1 border-t border-gray-100"></div>
                                 <button
-                                    onClick={() => handleDelete(item)}
+                                    onClick={() => deleteModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Delete</span>
@@ -237,7 +173,7 @@ const BankMaster = () => {
                         </button>
                         <button
                             className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
-                            onClick={handleCreate}
+                            onClick={() => addModal.openModal()}
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Add New Bank
@@ -252,6 +188,8 @@ const BankMaster = () => {
                     </div>
                     <input
                         type="text"
+                        value={searchQuery}
+                        onChange={handleSearch}
                         placeholder="Search banks..."
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
                     />
@@ -259,23 +197,54 @@ const BankMaster = () => {
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
-                <Table
-                    data={banks}
-                    columns={columns}
-                    currentPage={1}
-                    totalPages={2}
-                    onPageChange={(page) => console.log(`Page changed to ${page}`)}
-                />
+                {loading ? (
+                    <div className="p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading banks...</p>
+                    </div>
+                ) : error ? (
+                    <div className="p-8 text-center">
+                        <p className="text-red-600">{error}</p>
+                    </div>
+                ) : (
+                    <Table
+                        data={banks}
+                        columns={columns}
+                        currentPage={1}
+                        totalPages={10}
+                        onPageChange={(page) => console.log(`Page changed to ${page}`)}
+                    />
+                )}
             </div>
 
-            <Modal
-                title={bankMasterConfig.title}
-                isOpen={modalState.isOpen}
-                onClose={() => setModalState({ ...modalState, isOpen: false })}
-                mode={modalState.mode}
-                initialData={modalState.data}
-                tabs={bankMasterConfig.tabs}
-                onSubmit={handleSubmit}
+            <AddModal
+                recordType="bank"
+                isOpen={addModal.isOpen}
+                onClose={addModal.closeModal}
+                onSubmit={handleAdd}
+            />
+
+            <ViewModal
+                recordType="bank"
+                isOpen={viewModal.isOpen}
+                onClose={viewModal.closeModal}
+                data={viewModal.modalData}
+            />
+
+            <EditModal
+                recordType="bank"
+                isOpen={editModal.isOpen}
+                onClose={editModal.closeModal}
+                data={editModal.modalData}
+                onSubmit={handleEdit}
+            />
+
+            <DeleteModal
+                recordName="bank"
+                isOpen={deleteModal.isOpen}
+                onClose={deleteModal.closeModal}
+                onDelete={handleDelete}
+                identifier={deleteModal.modalData?.bankName || ""}
             />
         </div>
     );

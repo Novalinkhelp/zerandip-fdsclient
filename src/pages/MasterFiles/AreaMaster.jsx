@@ -5,186 +5,130 @@ import {
     Search,
     EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { useEffect, useState } from "react";
+import { fetchAreas } from "../../utils/mockApi";
 import Table from "../../components/table/Table";
-import Modal from "../../components/shared/Modal";
-import { areaMasterConfig } from "../../config/formFieldsConfig";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const AreaMaster = () => {
-    const [areas, setAreas] = useState([
-        {
-            id: 1,
-            code: "AREA001",
-            name: "Central Nairobi",
-            city: "Nairobi",
-            routeCode: "RT001"
-        },
-        {
-            id: 2,
-            code: "AREA002",
-            name: "Westlands",
-            city: "Nairobi",
-            routeCode: "RT002"
-        },
-        {
-            id: 3,
-            code: "AREA003",
-            name: "Mombasa CBD",
-            city: "Mombasa",
-            routeCode: "RT003"
-        },
-        {
-            id: 4,
-            code: "AREA004",
-            name: "Nyali",
-            city: "Mombasa",
-            routeCode: "RT003"
-        },
-        {
-            id: 5,
-            code: "AREA005",
-            name: "Kampala Central",
-            city: "Kampala",
-            routeCode: "RT004"
-        },
-        {
-            id: 6,
-            code: "AREA006",
-            name: "Dar es Salaam Port",
-            city: "Dar es Salaam",
-            routeCode: "RT005"
-        },
-        {
-            id: 7,
-            code: "AREA007",
-            name: "Kigali Business District",
-            city: "Kigali",
-            routeCode: "RT006"
-        },
-        {
-            id: 8,
-            code: "AREA008",
-            name: "Kisumu Lakeside",
-            city: "Kisumu",
-            routeCode: "RT007"
-        }
-    ]);
+    const [areas, setAreas] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [modalState, setModalState] = useState({
-        isOpen: false,
-        mode: "create",
-        data: {}
-    });
+    const addModal = useModal();
+    const viewModal = useModal();
+    const editModal = useModal();
+    const deleteModal = useModal();
 
-    const closeAllDropdowns = () => setActiveDropdown(null);
-
-    const handleCreate = () => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "create",
-            data: {}
-        });
-    }
-
-    const handleView = (area) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "view",
-            data: area
-        });
-    }
-
-    const handleEdit = (area) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "edit",
-            data: area
-        });
-    }
-
-    const handleDelete = (area) => {
-        closeAllDropdowns();
-        if (window.confirm(`Delete ${area.name}?`)) {
-            setAreas(areas.filter((a) => a.id !== area.id));
-        }
-    }
-
-    const handleSubmit = (formData) => {
-        closeAllDropdowns();
-        if (modalState.mode === "create") {
-            setAreas([...areas, { ...formData, id: Date.now() }])
-        } else {
-            setAreas(
-                areas.map((area) =>
-                    area.id === modalState.data.id ? { ...area, ...formData } : area)
-            );
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchAreas(searchQuery);
+                const validData = data.filter(
+                    (area) => area.areaCode && area.areaName
+                );
+                setAreas(validData);
+                setError(null);
+            } catch (error) {
+                setError("Failed to fetch areas");
+                console.error("Error:", error);
+            } finally {
+                setLoading(false);
+            }
         }
 
+        fetchData();
+    }, [searchQuery])
+
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const closeAllDropdowns = () => setOpenDropdownId(null);
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    }
+
+    const handleAdd = (newArea) => {
+        setAreas([...areas, { ...newArea, id: Date.now() }]);
+        addModal.closeModal();
+    }
+
+    const handleEdit = (updatedArea) => {
+        setAreas(areas.map((area) =>
+            area.id === updatedArea.id ? updatedArea : area
+        ));
+        editModal.closeModal();
+    }
+
+    const handleDelete = () => {
+        setAreas(areas.filter((area) => area.id !== deleteModal.modalData.id));
+        deleteModal.closeModal();
     }
 
     const columns = [
         {
-            key: "code",
+            key: "areaCode",
             header: "Area Code",
             render: (item) => (
-                <span className="font-medium text-gray-900">{item.code}</span>
+                <span className="font-medium text-gray-900">{item.areaCode}</span>
             ),
         },
         {
-            key: "name",
+            key: "areaName",
             header: "Area Name",
-            render: (item) => <span className="text-gray-800">{item.name}</span>,
+            render: (item) => <span className="text-gray-800">{item.areaName}</span>,
         },
         {
-            key: "city",
+            key: "cityName",
             header: "City",
-            render: (item) => <span className="text-gray-600">{item.city}</span>,
+            render: (item) => <span className="text-gray-600">{item.cityName}</span>,
         },
         {
-            key: "route-code",
+            key: "routeCode",
             header: "Route Code",
             render: (item) => <span className="text-gray-600">{item.routeCode}</span>,
         },
         {
             key: "actions",
-            header: "",
+            header: "Actions",
             render: (item, index, data) => (
                 <div className="relative">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            setActiveDropdown(activeDropdown === item.id ? null : item.id);
+                            setOpenDropdownId(openDropdownId === item.id ? null : item.id);
                         }}
                         className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
                         <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
                     </button>
 
-                    {activeDropdown === item.id && (
+                    {openDropdownId === item.id && (
                         <div
                             className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                                 }`}
                         >
                             <div className="p-1">
                                 <button
-                                    onClick={() => handleView(item)}
+                                    onClick={() => viewModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">View Details</span>
                                 </button>
                                 <button
-                                    onClick={() => handleEdit(item)}
+                                    onClick={() => editModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Edit</span>
                                 </button>
                                 <div className="my-1 border-t border-gray-100"></div>
                                 <button
-                                    onClick={() => handleDelete(item)}
+                                    onClick={() => deleteModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Delete</span>
@@ -222,7 +166,7 @@ const AreaMaster = () => {
                         </button>
                         <button
                             className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
-                            onClick={handleCreate}
+                            onClick={() => addModal.openModal()}
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Add New Area
@@ -237,31 +181,66 @@ const AreaMaster = () => {
                     </div>
                     <input
                         type="text"
-                        placeholder="Search Area..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        placeholder="Search areas..."
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
                     />
                 </div>
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
-                <Table
-                    data={areas}
-                    columns={columns}
-                    currentPage={1}
-                    totalPages={2}
-                    onPageChange={(page) => console.log(`Page changed to ${page}`)}
-                />
+                {loading ? (
+                    <div className="p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading areas...</p>
+                    </div>
+                ) : error ? (
+                    <div className="p-8 text-center">
+                        <p className="text-red-600">{error}</p>
+                    </div>
+                ) : (
+                    <Table
+                        data={areas}
+                        columns={columns}
+                        currentPage={1}
+                        totalPages={10}
+                        onPageChange={(page) => console.log(`Page changed to ${page}`)}
+                    />
+                )}
             </div>
 
-            <Modal
-                title={areaMasterConfig.title}
-                isOpen={modalState.isOpen}
-                onClose={() => setModalState({ ...modalState, isOpen: false })}
-                mode={modalState.mode}
-                initialData={modalState.data}
-                tabs={areaMasterConfig.tabs}
-                onSubmit={handleSubmit}
+            {/* Modals */}
+            <AddModal
+                recordType="area"
+                isOpen={addModal.isOpen}
+                onClose={addModal.closeModal}
+                onSubmit={handleAdd}
             />
+
+            <ViewModal
+                recordType="area"
+                isOpen={viewModal.isOpen}
+                onClose={viewModal.closeModal}
+                data={viewModal.modalData}
+            />
+
+            <EditModal
+                recordType="area"
+                isOpen={editModal.isOpen}
+                onClose={editModal.closeModal}
+                data={editModal.modalData}
+                onSubmit={handleEdit}
+            />
+
+            <DeleteModal
+                isOpen={deleteModal.isOpen}
+                onClose={deleteModal.closeModal}
+                onDelete={handleDelete}
+                recordName="area"
+                identifier={deleteModal.modalData?.areaName || ""}
+            />
+
         </div>
     );
 };

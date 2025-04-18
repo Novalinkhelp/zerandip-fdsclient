@@ -5,104 +5,87 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { fetchReasonRemarks } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const ReasonRemarkMaster = () => {
-  const [reasonRemarks, setReasonRemarks] = useState([
-    {
-      id: 1,
-      code: "RR001",
-      name: "Stock Shortage",
-      category: "Inventory",
-      type: "Reason"
-    },
-    {
-      id: 2,
-      code: "RR002",
-      name: "Quality Control Failed",
-      category: "Product",
-      type: "Reason"
-    },
-    {
-      id: 3,
-      code: "RR003",
-      name: "Customer Request",
-      category: "Sales",
-      type: "Reason"
-    },
-    {
-      id: 4,
-      code: "RR004",
-      name: "Transport Delay",
-      category: "Logistics",
-      type: "Reason"
-    },
-    {
-      id: 5,
-      code: "RR005",
-      name: "Handle with Care",
-      category: "Shipping",
-      type: "Remark"
-    },
-    {
-      id: 6,
-      code: "RR006",
-      name: "Urgent Delivery",
-      category: "Logistics",
-      type: "Remark"
-    },
-    {
-      id: 7,
-      code: "RR007",
-      name: "Payment Pending",
-      category: "Finance",
-      type: "Remark"
-    },
-    {
-      id: 8,
-      code: "RR008",
-      name: "Special Discount Applied",
-      category: "Sales",
-      type: "Remark"
+  const [reasonRemarks, setReasonRemarks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchReasonRemarks(searchQuery);
+        const validData = data.filter(
+          (r) => r.reasonRemarkCode && r.description
+        )
+        setReasonRemarks(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch reason/remark data");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+    fetchData();
+  }, [searchQuery])
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
-  const handleAction = (action, reasonRemark) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", reasonRemark);
-        break;
-      case "edit":
-        console.log("Edit:", reasonRemark);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${reasonRemark.name}?`)) {
-          setReasonRemarks(reasonRemarks.filter((c) => c.id !== reasonRemark.id));
-        }
-        break;
-      default:
-        break;
-    }
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
+
+  const handleAdd = (newReasonRemark) => {
+    setReasonRemarks([...reasonRemarks, { ...newReasonRemark, id: Date.now() }]);
+    addModal.closeModal();
+  };
+
+  const handleEdit = (updatedReasonRemark) => {
+    setReasonRemarks(
+      reasonRemarks.map((r) =>
+        r.id === updatedReasonRemark.id ? updatedReasonRemark : r
+      )
+    );
+    editModal.closeModal();
+  };
+
+  const handleDelete = () => {
+    setReasonRemarks(
+      reasonRemarks.filter((r) => r.id !== deleteModal.modalData?.id)
+    );
+    deleteModal.closeModal();
+  }
 
   const columns = [
     {
-      key: "code",
+      key: "reasonRemarkCode",
       header: "Reason/Remark Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.reasonRemarkCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "description",
       header: "Description",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => <span className="text-gray-800">{item.description}</span>,
     },
     {
       key: "category",
@@ -116,40 +99,40 @@ const ReasonRemarkMaster = () => {
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -185,7 +168,10 @@ const ReasonRemarkMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              onClick={() => addModal.openModal()}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Reason/Remark
             </button>
@@ -199,6 +185,8 @@ const ReasonRemarkMaster = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search reasons/remarks..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -206,14 +194,56 @@ const ReasonRemarkMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={reasonRemarks}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading reason/remarks...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={reasonRemarks}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
+
+      {/* Modals */}
+      <AddModal
+        recordType="reasonRemark"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="reasonRemark"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="reasonRemark"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="reasonRemark"
+        identifier={deleteModal.modalData?.description || ""}
+      />
     </div>
   );
 };

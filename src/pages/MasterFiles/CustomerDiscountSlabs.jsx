@@ -5,138 +5,129 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { fetchCustomerDiscountSlabs } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const CustomerDiscountSlabs = () => {
-  const [customerDiscountSlabs, setCustomerDiscountSlabs] = useState([
-    {
-      id: 1,
-      code: "CUST001",
-      name: "Simba Auto Parts Ltd",
-      status: "Active",
-    },
-    {
-      id: 2,
-      code: "CUST002",
-      name: "Motorway Garage",
-      status: "Active",
-    },
-    {
-      id: 3,
-      code: "CUST003",
-      name: "Safari Fleet Services",
-      status: "Active",
-    },
-    {
-      id: 4,
-      code: "CUST004",
-      name: "Mwananchi Mechanics",
-      status: "Inactive",
-    },
-    {
-      id: 5,
-      code: "CUST005",
-      name: "Pearl Auto Centre",
-      status: "Active",
-    },
-    {
-      id: 6,
-      code: "CUST006",
-      name: "Mountain Motors Ltd",
-      status: "Active",
-    },
-    {
-      id: 7,
-      code: "CUST007",
-      name: "Kigali Auto Spares",
-      status: "Active",
-    },
-    {
-      id: 8,
-      code: "CUST008",
-      name: "Lakeside Motors",
-      status: "Active",
+  const [customerDiscountSlabs, setCustomerDiscountSlabs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchCustomerDiscountSlabs(searchQuery);
+        const validData = data.filter(
+          (disc) => disc.customerCode && disc.customerName
+        );
+        setCustomerDiscountSlabs(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch customer discount slabs");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+    fetchData();
+  }, [searchQuery]);
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
-  const handleAction = (action, customerDiscountSlab) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", customerDiscountSlab);
-        break;
-      case "edit":
-        console.log("Edit:", customerDiscountSlab);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${customerDiscountSlab.name}?`)) {
-          setCustomerDiscountSlabs(CustomerDiscountSlabs.filter((c) => c.id !== customerDiscountSlab.id));
-        }
-        break;
-      default:
-        break;
-    }
-  };
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  }
+
+  const handleAdd = (newSlab) => {
+    setCustomerDiscountSlabs([...customerDiscountSlabs, { ...newSlab, id: Date.now() }]);
+    addModal.closeModal();
+  }
+
+  const handleEdit = (updatedSlab) => {
+    setCustomerDiscountSlabs(
+      customerDiscountSlabs.map((slab) =>
+        slab.id === updatedSlab.id ? updatedSlab : slab
+      )
+    );
+    editModal.closeModal();
+  }
+
+  const handleDelete = () => {
+    setCustomerDiscountSlabs(
+      customerDiscountSlabs.filter((slab) => slab.id !== deleteModal.modalData.id)
+    );
+    deleteModal.closeModal();
+  }
 
   const columns = [
     {
-      key: "code",
+      key: "customerCode",
       header: "Customer Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.customerCode}</span>
       ),
     },
     {
-      key: "name",
+      key: "customerName",
       header: "Customer Name",
-      render: (item) => <span className="text-gray-800">{item.name}</span>,
+      render: (item) => <span className="text-gray-800">{item.customerName}</span>,
     },
     {
-      key: "status",
+      key: "active",
       header: "Status",
-      render: (item) => <span className="text-gray-600">{item.status}</span>,
+      render: (item) => <span className="text-gray-600">{item.active}</span>,
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -172,7 +163,10 @@ const CustomerDiscountSlabs = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              onClick={() => addModal.openModal()}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Slab
             </button>
@@ -186,6 +180,8 @@ const CustomerDiscountSlabs = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search customer discount slabs..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -193,14 +189,60 @@ const CustomerDiscountSlabs = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={customerDiscountSlabs}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading customer discount slabs...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={customerDiscountSlabs}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
+
+      {/* Modals */}
+      <AddModal
+        recordType="customerDiscountSlabs"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+        width="max-w-7xl"
+      />
+
+      <ViewModal
+        recordType="customerDiscountSlabs"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+        width="max-w-7xl"
+      />
+
+      <EditModal
+        recordType="customerDiscountSlabs"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+        width="max-w-7xl"
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="customerDiscountSlabs"
+        identifier={deleteModal.modalData?.customerName || ""}
+        width="max-w-7xl"
+      />
     </div>
   );
 };

@@ -5,162 +5,129 @@ import {
   Search,
   EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { fetchShopReps } from "../../utils/mockApi";
+import { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
 
 const ShopSalesRepMaster = () => {
-  const [shopReps, setShopReps] = useState([
-    {
-      id: 1,
-      code: "SHOP001",
-      repCode: "SR001",
-      name: "James Kimani",
-      location: "Nairobi CBD Branch",
-      contactNo: "+254-711-1122334",
-      email: "j.kimani@zerendib.com"
-    },
-    {
-      id: 2,
-      code: "SHOP002",
-      repCode: "SR002",
-      name: "Mary Wangui",
-      location: "Westlands Mall Shop",
-      contactNo: "+254-722-2233445",
-      email: "m.wangui@zerendib.com"
-    },
-    {
-      id: 3,
-      code: "SHOP003",
-      repCode: "SR003",
-      name: "Robert Ouko",
-      location: "Mombasa Road Outlet",
-      contactNo: "+254-733-3344556",
-      email: "r.ouko@zerendib.com"
-    },
-    {
-      id: 4,
-      code: "SHOP004",
-      repCode: "SR004",
-      name: "Patricia Nambi",
-      location: "Kampala City Centre",
-      contactNo: "+256-772-4455667",
-      email: "p.nambi@zerendib.com"
-    },
-    {
-      id: 5,
-      code: "SHOP005",
-      repCode: "SR005",
-      name: "Ahmed Hussein",
-      location: "Dar es Salaam Plaza",
-      contactNo: "+255-744-5566778",
-      email: "a.hussein@zerendib.com"
-    },
-    {
-      id: 6,
-      code: "SHOP006",
-      repCode: "SR006",
-      name: "Claudette Uwase",
-      location: "Kigali Trade Center",
-      contactNo: "+250-788-6677889",
-      email: "c.uwase@zerendib.com"
-    },
-    {
-      id: 7,
-      code: "SHOP007",
-      repCode: "SR007",
-      name: "Michael Okoth",
-      location: "Kisumu Lakeside Mall",
-      contactNo: "+254-722-7788990",
-      email: "m.okoth@zerendib.com"
-    },
-    {
-      id: 8,
-      code: "SHOP008",
-      repCode: "SR008",
-      name: "Grace Mwangi",
-      location: "Arusha Shopping Center",
-      contactNo: "+255-744-8899001",
-      email: "g.mwangi@zerendib.com"
+  const [shopReps, setShopReps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const addModal = useModal();
+  const viewModal = useModal();
+  const editModal = useModal();
+  const deleteModal = useModal();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchShopReps(searchQuery);
+        const validData = data.filter(
+          (shopRep) => shopRep.repCode && shopRep.shopRepCode
+        );
+        setShopReps(validData);
+        setError(null);
+      } catch (error) {
+        setError("Failed to fetch shop sales reps");
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+    fetchData();
+  }, [searchQuery])
 
-  const closeAllDropdowns = () => setActiveDropdown(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
-  const handleAction = (action, shopRep) => {
-    closeAllDropdowns();
-    switch (action) {
-      case "view":
-        console.log("View:", shopRep);
-        break;
-      case "edit":
-        console.log("Edit:", shopRep);
-        break;
-      case "delete":
-        if (window.confirm(`Delete ${shopRep.name}?`)) {
-          setShopReps(shopReps.filter((c) => c.id !== shopRep.id));
-        }
-        break;
-      default:
-        break;
-    }
-  };
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  }
+
+  const handleAdd = (newShopRep) => {
+    setShopReps([...shopReps, { ...newShopRep, id: Date.now() }]);
+    addModal.closeModal();
+  }
+
+  const handleEdit = (updatedShopRep) => {
+    setShopReps(
+      shopReps.map((shopRep) =>
+        shopRep.id === updatedShopRep.id ? updatedShopRep : shopRep
+      )
+    );
+    editModal.closeModal();
+  }
+
+  const handleDelete = () => {
+    setShopReps(
+      shopReps.filter((shopRep) => shopRep.id !== deleteModal.modalData.id)
+    );
+    deleteModal.closeModal();
+  }
 
   const columns = [
     {
-      key: "code",
+      key: "shopRepCode",
       header: "Shop Rep Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.code}</span>
+        <span className="font-medium text-gray-900">{item.shopRepCode}</span>
       ),
     },
     {
-      key: "rep-code",
+      key: "repCode",
       header: "Rep Code",
       render: (item) => <span className="text-gray-800">{item.repCode}</span>,
     },
     {
-      key: "name",
+      key: "shopRepName",
       header: "Shop Rep Name",
-      render: (item) => <span className="text-gray-600">{item.name}</span>,
+      render: (item) => <span className="text-gray-600">{item.shopRepName}</span>,
     },
     {
       key: "actions",
-      header: "",
+      header: "Actions",
       render: (item, index, data) => (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveDropdown(activeDropdown === item.id ? null : item.id);
+              setOpenDropdownId(openDropdownId === item.id ? null : item.id);
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
           </button>
 
-          {activeDropdown === item.id && (
+          {openDropdownId === item.id && (
             <div
               className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                 }`}
             >
               <div className="p-1">
                 <button
-                  onClick={() => handleAction("view", item)}
+                  onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">View Details</span>
                 </button>
                 <button
-                  onClick={() => handleAction("edit", item)}
+                  onClick={() => editModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Edit</span>
                 </button>
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
-                  onClick={() => handleAction("delete", item)}
+                  onClick={() => deleteModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                 >
                   <span className="flex-1 text-left">Delete</span>
@@ -196,7 +163,10 @@ const ShopSalesRepMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer">
+            <button
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              onClick={() => addModal.openModal()}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add New Shop Sales Rep
             </button>
@@ -210,6 +180,8 @@ const ShopSalesRepMaster = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
             placeholder="Search shop sales rep..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
           />
@@ -217,15 +189,57 @@ const ShopSalesRepMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table
-          data={shopReps}
-          columns={columns}
-          currentPage={1}
-          totalPages={2}
-          onPageChange={(page) => console.log(`Page changed to ${page}`)}
-        />
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading shop reps...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={shopReps}
+            columns={columns}
+            currentPage={1}
+            totalPages={10}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
-    </div>
+
+      {/* Modals */}
+      <AddModal
+        recordType="shopSalesRep"
+        isOpen={addModal.isOpen}
+        onClose={addModal.closeModal}
+        onSubmit={handleAdd}
+      />
+
+      <ViewModal
+        recordType="shopSalesRep"
+        isOpen={viewModal.isOpen}
+        onClose={viewModal.closeModal}
+        data={viewModal.modalData}
+      />
+
+      <EditModal
+        recordType="shopSalesRep"
+        isOpen={editModal.isOpen}
+        onClose={editModal.closeModal}
+        data={editModal.modalData}
+        onSubmit={handleEdit}
+      />
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onDelete={handleDelete}
+        recordName="shopSalesRep"
+        identifier={deleteModal.modalData?.shopRepName || ""}
+      />
+    </div >
   );
 };
 

@@ -35,37 +35,37 @@ const MasterDataManagement = () => {
       icon: <Building2 className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Company Master",
+          name: "Company Master",
           path: "/master-data/company-master",
           icon: <Building className="w-4 h-4" />,
         },
         {
-          name: "View Bank Master",
+          name: "Bank Master",
           path: "/master-data/bank-master",
           icon: <Building className="w-4 h-4" />,
         },
         {
-          name: "View Bank Branch Master",
+          name: "Bank Branch Master",
           path: "/master-data/bank-branch-master",
           icon: <Building className="w-4 h-4" />,
         },
         {
-          name: "View Location Master",
+          name: "Location Master",
           path: "/master-data/location-master",
           icon: <MapPin className="w-4 h-4" />,
         },
         {
-          name: "View Area Master",
+          name: "Area Master",
           path: "/master-data/area-master",
           icon: <Map className="w-4 h-4" />,
         },
         {
-          name: "View Route Master",
+          name: "Route Master",
           path: "/master-data/route-master",
           icon: <Route className="w-4 h-4" />,
         },
         {
-          name: "View Utility Master",
+          name: "Utility Master",
           path: "/master-data/utility-master",
           icon: <Wrench className="w-4 h-4" />,
         },
@@ -78,27 +78,27 @@ const MasterDataManagement = () => {
       icon: <ClipboardList className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Item Master",
+          name: "Item Master",
           path: "/master-data/item-master",
           icon: <Package className="w-4 h-4" />,
         },
         {
-          name: "View Hs Code Master",
+          name: "Hs Code Master",
           path: "/master-data/hs-code-master",
           icon: <Barcode className="w-4 h-4" />,
         },
         {
-          name: "View Category Master",
+          name: "Category Master",
           path: "/master-data/category-master",
           icon: <ListFilter className="w-4 h-4" />,
         },
         {
-          name: "View Classification Master",
+          name: "Classification Master",
           path: "/master-data/classification-master",
           icon: <Tags className="w-4 h-4" />,
         },
         {
-          name: "View HS Code Classification Change",
+          name: "HS Code Classification Change",
           path: "/master-data/hs-code-classification-change",
           icon: <FileCog className="w-4 h-4" />,
         },
@@ -111,17 +111,17 @@ const MasterDataManagement = () => {
       icon: <Users2 className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Customer Master",
+          name: "Customer Master",
           path: "/master-data/customer-master",
           icon: <Users2 className="w-4 h-4" />,
         },
         {
-          name: "View Supplier Master",
+          name: "Supplier Master",
           path: "/master-data/supplier-master",
           icon: <Building className="w-4 h-4" />,
         },
         {
-          name: "View Transport Agent Master",
+          name: "Transport Agent Master",
           path: "/master-data/transport-agent-master",
           icon: <Truck className="w-4 h-4" />,
         },
@@ -134,17 +134,17 @@ const MasterDataManagement = () => {
       icon: <CircleDollarSign className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Item Whole Sales Master",
+          name: "Item Whole Sales Master",
           path: "/master-data/item-whole-sales-master",
           icon: <DollarSign className="w-4 h-4" />,
         },
         {
-          name: "View Customer Discount Slabs",
+          name: "Customer Discount Slabs",
           path: "/master-data/customer-discount-slabs",
           icon: <BadgePercent className="w-4 h-4" />,
         },
         {
-          name: "View Expense Category Master",
+          name: "Expense Category Master",
           path: "/master-data/expense-category-master",
           icon: <PiggyBank className="w-4 h-4" />,
         },
@@ -157,17 +157,17 @@ const MasterDataManagement = () => {
       icon: <CircleUser className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Invoice Master",
+          name: "Invoice Master",
           path: "/master-data/invoice-master",
           icon: <Receipt className="w-4 h-4" />,
         },
         {
-          name: "View Sales Rep Master",
+          name: "Sales Rep Master",
           path: "/master-data/sales-rep-master",
           icon: <UserRound className="w-4 h-4" />,
         },
         {
-          name: "View Shop Sales Rep Master",
+          name: "Shop Sales Rep Master",
           path: "/master-data/shop-sales-rep-master",
           icon: <ShoppingCart className="w-4 h-4" />,
         },
@@ -180,7 +180,7 @@ const MasterDataManagement = () => {
       icon: <Ellipsis className="w-10 h-10" />,
       buttons: [
         {
-          name: "View Reason/Remarks Master",
+          name: "Reason/Remarks Master",
           path: "/master-data/reason-remarks-master",
           icon: <MessageSquareText className="w-4 h-4" />,
         },

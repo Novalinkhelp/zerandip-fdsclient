@@ -5,131 +5,84 @@ import {
     Search,
     EllipsisVerticalIcon,
 } from "lucide-react";
-import { useState } from "react";
+import useModal from "../../hooks/useModal";
+import { useEffect, useState } from "react";
+import { fetchLocations } from "../../utils/mockApi";
 import Table from "../../components/table/Table";
-import Modal from "../../components/shared/Modal";
-import { locationMasterConfig } from "../../config/formFieldsConfig";
+import AddModal from "../../components/modals/AddModal";
+import ViewModal from "../../components/modals/ViewModal";
+import EditModal from "../../components/modals/EditModal";
+import DeleteModal from "../../components/modals/DeleteModal";
+
 
 const LocationMaster = () => {
-    const [locations, setLocations] = useState([
-        {
-            id: 1,
-            code: "LOC001",
-            name: "Main Warehouse",
-            type: "Warehouse",
-        },
-        {
-            id: 2,
-            code: "LOC002",
-            name: "Central Store",
-            type: "Retail",
-        },
-        {
-            id: 3,
-            code: "LOC003",
-            name: "Mombasa Distribution Center",
-            type: "Distribution",
-        },
-        {
-            id: 4,
-            code: "LOC004",
-            name: "Dar es Salaam Port Facility",
-            type: "Port",
-        },
-        {
-            id: 5,
-            code: "LOC005",
-            name: "Kampala Office",
-            type: "Office",
-        },
-        {
-            id: 6,
-            code: "LOC006",
-            name: "Arusha Storage Facility",
-            type: "Warehouse",
-        },
-        {
-            id: 7,
-            code: "LOC007",
-            name: "Kigali Transit Hub",
-            type: "Transit",
-        },
-        {
-            id: 8,
-            code: "LOC008",
-            name: "Kisumu Retail Center",
-            type: "Retail",
-        }
-    ]);
+    const [locations, setLocations] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [modalState, setModalState] = useState({
-        isOpen: false,
-        mode: "create",
-        data: {}
-    });
+    const addModal = useModal();
+    const viewModal = useModal();
+    const editModal = useModal();
+    const deleteModal = useModal();
 
-    const closeAllDropdowns = () => setActiveDropdown(null);
-
-    const handleCreate = () => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "create",
-            data: {}
-        });
-    }
-
-    const handleView = (location) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "view",
-            data: location
-        });
-    }
-
-    const handleEdit = (location) => {
-        closeAllDropdowns();
-        setModalState({
-            isOpen: true,
-            mode: "edit",
-            data: location
-        });
-    }
-
-    const handleDelete = (location) => {
-        closeAllDropdowns();
-        if (window.confirm(`Delete ${location.name}?`)) {
-            setLocations(locations.filter((loc) => loc.id !== location.id))
-        }
-    }
-
-    const handleSubmit = (formData) => {
-        closeAllDropdowns();
-        if (modalState.mode === "create") {
-            setLocations([...locations, { ...formData, id: Date.now() }])
-        } else {
-            setLocations(
-                locations.map((loc) =>
-                    loc.id === modalState.data.id ? { ...loc, ...formData } : loc
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchLocations(searchQuery);
+                const validData = data.filter(
+                    (loc) => loc.locationCode && loc.description
                 )
-            );
+                setLocations(validData);
+                setError(null);
+            } catch (error) {
+                setError("Failed to fetch locations");
+                console.error("Error:", error);
+            } finally {
+                setLoading(false);
+            }
         }
+
+        fetchData();
+    }, [searchQuery])
+
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const closeAllDropdowns = () => setOpenDropdownId(null);
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    }
+
+    const handleAdd = (newLocation) => {
+        setLocations([...locations, { ...newLocation, id: Date.now() }]);
+        addModal.closeModal();
+    }
+
+    const handleEdit = (updatedLocation) => {
+        setLocations(locations.map(
+            (loc) => loc.id === updatedLocation.id ? updatedLocation : loc
+        ));
+        editModal.closeModal();
+    }
+
+    const handleDelete = () => {
+        setLocations(locations.filter((loc) => loc.id !== deleteModal.modalData.id));
+        deleteModal.closeModal();
     }
 
     const columns = [
         {
-            key: "code",
+            key: "locationCode",
             header: "Location Code",
             render: (item) => (
-                <span className="font-medium text-gray-900">{item.code}</span>
+                <span className="font-medium text-gray-900">{item.locationCode}</span>
             ),
         },
         {
             key: "description",
             header: "Location Description",
-            render: (item) => <span className="text-gray-800">{item.name}</span>,
+            render: (item) => <span className="text-gray-800">{item.description}</span>,
         },
         {
             key: "type",
@@ -138,40 +91,40 @@ const LocationMaster = () => {
         },
         {
             key: "actions",
-            header: "",
+            header: "Actions",
             render: (item, index, data) => (
                 <div className="relative">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            setActiveDropdown(activeDropdown === item.id ? null : item.id);
+                            setOpenDropdownId(openDropdownId === item.id ? null : item.id);
                         }}
                         className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     >
                         <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
                     </button>
 
-                    {activeDropdown === item.id && (
+                    {openDropdownId === item.id && (
                         <div
                             className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
                                 }`}
                         >
                             <div className="p-1">
                                 <button
-                                    onClick={() => handleView(item)}
+                                    onClick={() => viewModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">View Details</span>
                                 </button>
                                 <button
-                                    onClick={() => handleEdit(item)}
+                                    onClick={() => editModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Edit</span>
                                 </button>
                                 <div className="my-1 border-t border-gray-100"></div>
                                 <button
-                                    onClick={() => handleDelete(item)}
+                                    onClick={() => deleteModal.openModal(item)}
                                     className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 cursor-pointer"
                                 >
                                     <span className="flex-1 text-left">Delete</span>
@@ -209,7 +162,7 @@ const LocationMaster = () => {
                         </button>
                         <button
                             className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
-                            onClick={handleCreate}>
+                            onClick={() => addModal.openModal()}>
                             <Plus className="h-4 w-4 mr-2" />
                             Add New Location
                         </button>
@@ -223,30 +176,64 @@ const LocationMaster = () => {
                     </div>
                     <input
                         type="text"
-                        placeholder="Search location..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        placeholder="Search locations..."
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
                     />
                 </div>
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
-                <Table
-                    data={locations}
-                    columns={columns}
-                    currentPage={1}
-                    totalPages={2}
-                    onPageChange={(page) => console.log(`Page changed to ${page}`)}
-                />
+                {loading ? (
+                    <div className="p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading companies...</p>
+                    </div>
+                ) : error ? (
+                    <div className="p-8 text-center">
+                        <p className="text-red-600">{error}</p>
+                    </div>
+                ) : (
+                    <Table
+                        data={locations}
+                        columns={columns}
+                        currentPage={1}
+                        totalPages={10}
+                        onPageChange={(page) => console.log(`Page changed to ${page}`)}
+                    />
+                )}
             </div>
 
-            <Modal
-                title={locationMasterConfig.title}
-                isOpen={modalState.isOpen}
-                onClose={() => setModalState({ ...modalState, isOpen: false })}
-                mode={modalState.mode}
-                initialData={modalState.data}
-                tabs={locationMasterConfig.tabs}
-                onSubmit={handleSubmit}
+            {/* Modals */}
+            <AddModal
+                recordType="location"
+                isOpen={addModal.isOpen}
+                onClose={addModal.closeModal}
+                onSubmit={handleAdd}
+            />
+
+            <ViewModal
+                recordType="location"
+                isOpen={viewModal.isOpen}
+                onClose={viewModal.closeModal}
+                data={viewModal.modalData}
+            />
+
+            <EditModal
+                recordType="location"
+                isOpen={editModal.isOpen}
+                onClose={editModal.closeModal}
+                data={editModal.modalData}
+                onSubmit={handleEdit}
+            />
+
+            <DeleteModal
+                isOpen={deleteModal.isOpen}
+                onClose={deleteModal.closeModal}
+                onDelete={handleDelete}
+                recordName="location"
+                identifier={deleteModal.modalData?.description || ""}
             />
         </div>
     );
