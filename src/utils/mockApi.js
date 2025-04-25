@@ -3418,6 +3418,169 @@ const mockItems = [
   },
 ];
 
+const mockLocationWiseItems = [
+  {
+    id: 1,
+    itemCode: "ENG-SP-001",
+    itemDescription: "Iridium Spark Plug - High Performance",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 87,
+  },
+  {
+    id: 2,
+    itemCode: "ENG-SP-001",
+    itemDescription: "Iridium Spark Plug - High Performance",
+    locationCode: "LOC-KAN-001",
+    locationDescription: "Kandy Regional Distribution Center",
+    quantityAvailable: 45,
+  },
+  {
+    id: 3,
+    itemCode: "ENG-SP-001",
+    itemDescription: "Iridium Spark Plug - High Performance",
+    locationCode: "LOC-GAL-001",
+    locationDescription: "Galle Service Center",
+    quantityAvailable: 23,
+  },
+  {
+    id: 4,
+    itemCode: "ENG-OF-001",
+    itemDescription: "Premium Oil Filter",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 120,
+  },
+  {
+    id: 5,
+    itemCode: "ENG-OF-001",
+    itemDescription: "Premium Oil Filter",
+    locationCode: "LOC-KAN-001",
+    locationDescription: "Kandy Regional Distribution Center",
+    quantityAvailable: 65,
+  },
+  {
+    id: 6,
+    itemCode: "ENG-OF-001",
+    itemDescription: "Premium Oil Filter",
+    locationCode: "LOC-JAF-001",
+    locationDescription: "Jaffna Parts Depot",
+    quantityAvailable: 38,
+  },
+  {
+    id: 7,
+    itemCode: "BRK-PAD-001",
+    itemDescription: "Ceramic Brake Pads (Front)",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 65,
+  },
+  {
+    id: 8,
+    itemCode: "BRK-PAD-001",
+    itemDescription: "Ceramic Brake Pads (Front)",
+    locationCode: "LOC-ANR-001",
+    locationDescription: "Anuradhapura Regional Store",
+    quantityAvailable: 32,
+  },
+  {
+    id: 9,
+    itemCode: "COOL-RAD-001",
+    itemDescription: "Aluminum Performance Radiator",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 18,
+  },
+  {
+    id: 10,
+    itemCode: "COOL-RAD-001",
+    itemDescription: "Aluminum Performance Radiator",
+    locationCode: "LOC-COL-002",
+    locationDescription: "Colombo Display Room",
+    quantityAvailable: 4,
+  },
+  {
+    id: 11,
+    itemCode: "ELEC-ALT-001",
+    itemDescription: "High Output Alternator",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 15,
+  },
+  {
+    id: 12,
+    itemCode: "ELEC-ALT-001",
+    itemDescription: "High Output Alternator",
+    locationCode: "LOC-KUR-001",
+    locationDescription: "Kurunegala Parts Outlet",
+    quantityAvailable: 6,
+  },
+  {
+    id: 13,
+    itemCode: "FUEL-PMP-001",
+    itemDescription: "Electric Fuel Pump Assembly",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 32,
+  },
+  {
+    id: 14,
+    itemCode: "FUEL-PMP-001",
+    itemDescription: "Electric Fuel Pump Assembly",
+    locationCode: "LOC-MAT-001",
+    locationDescription: "Matara Service Center",
+    quantityAvailable: 13,
+  },
+  {
+    id: 15,
+    itemCode: "SUSP-KIT-001",
+    itemDescription: "Complete Suspension Kit",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 10,
+  },
+  {
+    id: 16,
+    itemCode: "SUSP-KIT-001",
+    itemDescription: "Complete Suspension Kit",
+    locationCode: "LOC-COL-003",
+    locationDescription: "Colombo Transit Storage",
+    quantityAvailable: 3,
+  },
+  {
+    id: 17,
+    itemCode: "TRANS-CL-001",
+    itemDescription: "Heavy Duty Clutch Kit",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 20,
+  },
+  {
+    id: 18,
+    itemCode: "TRANS-CL-001",
+    itemDescription: "Heavy Duty Clutch Kit",
+    locationCode: "LOC-NEG-001",
+    locationDescription: "Negombo Service Point",
+    quantityAvailable: 8,
+  },
+  {
+    id: 19,
+    itemCode: "ENG-AF-001",
+    itemDescription: "High-Flow Air Filter",
+    locationCode: "LOC-COL-001",
+    locationDescription: "Colombo Main Warehouse",
+    quantityAvailable: 48,
+  },
+  {
+    id: 20,
+    itemCode: "ENG-AF-001",
+    itemDescription: "High-Flow Air Filter",
+    locationCode: "LOC-GAL-001",
+    locationDescription: "Galle Service Center",
+    quantityAvailable: 22,
+  },
+];
+
 export const fetchCompanies = async (query = "") => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -3725,4 +3888,14 @@ export const fetchItems = async (query = "") => {
       item.classification.toLowerCase().includes(query.toLowerCase()) ||
       item.category.toLowerCase().includes(query.toLowerCase())
   );
+};
+
+export const fetchLocationWiseItems = async (query = "") => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  if (!query) {
+    return [];
+  }
+
+  return mockLocationWiseItems.filter((item) => item.itemCode === query);
 };

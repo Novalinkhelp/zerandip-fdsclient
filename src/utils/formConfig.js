@@ -1,3 +1,10 @@
+import {
+  fetchCustomers,
+  fetchItems,
+  fetchLocations,
+  fetchSalesReps,
+} from "./mockApi.js";
+
 export const getFormConfig = (recordType) => {
   const configs = {
     company: {
@@ -2627,6 +2634,572 @@ export const getFormConfig = (recordType) => {
           ],
         },
       ],
+    },
+    cashSales: {
+      customer: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              areaCode: "areaCode",
+              address: "customerAddress",
+              remarks: "remarks",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "areaCode",
+            label: "Area Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second Row
+          {
+            name: "address",
+            label: "Address",
+            type: "textarea",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "remarks",
+            label: "Remarks",
+            type: "textarea",
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      invoice: {
+        title: "Invoice Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "invoiceNumber",
+            label: "Invoice Number",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second Row
+          {
+            name: "orderNumber",
+            label: "Order Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "typeOfSale",
+            label: "Type of Sale",
+            type: "select",
+            options: [
+              { value: "WCC", label: "WCC" },
+              { value: "RCC", label: "RCC" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third Row
+          {
+            name: "locationCode",
+            label: "Location Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "itemDescription",
+            label: "Item Description",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityRequired",
+            label: "Quantity Required",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityInHand",
+            label: "Quantity In Hand",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityIssued",
+            label: "Quantity Issued",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "unitPrice",
+            label: "Unit Price",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "discount",
+            label: "Discount (%)",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "value",
+            label: "Value",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "locationCode",
+            label: "Location Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    creditSales: {
+      customer: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              areaCode: "areaCode",
+              customerName: "customerName",
+              address: "customerAddress",
+              creditLimit: "creditLimit",
+              outStanding: "colomboCredit", //WARNING: Only for testing
+            },
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "areaCode",
+            label: "Area Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          //Second Row
+          {
+            name: "creditLimit",
+            label: "Credit Limit",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "outStanding",
+            label: "Outstanding",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third Row
+          {
+            name: "pendingCheque",
+            label: "Pending Cheque",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "returnCheque",
+            label: "Return Cheque",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Forth Row
+          {
+            name: "address",
+            label: "Address",
+            type: "textarea",
+            className: "col-span-12",
+          },
+        ],
+      },
+      invoice: {
+        title: "Invoice Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "invoiceNumber",
+            label: "Invoice Number",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second Row
+          {
+            name: "orderNumber",
+            label: "Order Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "typeOfSale",
+            label: "Type of Sale",
+            type: "select",
+            options: [
+              { value: "WCC", label: "WCC" },
+              { value: "RCC", label: "RCC" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third Row
+          {
+            name: "locationType",
+            label: "Location Type",
+            type: "select",
+            options: [
+              { value: "Main", label: "Main" },
+              { value: "Rep", label: "Rep" },
+            ],
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityRequired",
+            label: "Quantity Required",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second row
+          {
+            name: "quantityInHand",
+            label: "Quantity In Hand",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityIssued",
+            label: "Quantity Issued",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third row
+          {
+            name: "discount",
+            label: "Discount (%)",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerDiscount",
+            label: "Customer Discount (%)",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Forth Row
+          {
+            name: "unitPrice",
+            label: "Unit Price",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "value",
+            label: "Value",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "locationCode",
+            label: "Location Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    quotation: {
+      customer: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerName: "customerName",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      invoice: {
+        title: "Invoice Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "select",
+            options: [
+              { value: "REP-001", label: "REP-001" },
+              { value: "REP-002", label: "REP-002" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "quotationNumber",
+            label: "Quotation Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "date",
+            label: "Date",
+            type: "text",
+            className: "col-span-12 md:col-span-4",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityRequired",
+            label: "Quantity Required",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "unitPrice",
+            label: "Unit Price",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    goodsReturn: {
+      returnNote: {
+        title: "Return Note Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "typeOfSale",
+            label: "Type of Sale",
+            type: "select",
+            options: [
+              { value: "WCC", label: "WCC" },
+              { value: "RCC", label: "RCC" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second row
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "locationCode",
+            label: "Location Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchLocations,
+            autofill: {
+              locationCode: "locationCode",
+            },
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third Row
+          {
+            name: "invoiceNumber",
+            label: "Invoice Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "date",
+            label: "Invoice Date",
+            type: "text",
+            className: "col-span-12 md:col-span-4",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            autofill: {
+              vatValue: "vatPercentage",
+              itemCode: "itemCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityIssued",
+            label: "Quantity Issued",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second Row
+          {
+            name: "quantityReturned",
+            label: "Quantity Returned",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "returnPrice",
+            label: "@ Return Price",
+            type: "number",
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "valueOfReturn",
+            label: "Value Of Return",
+            type: "number",
+            className: "col-span-12 md:col-span-4",
+          },
+          //Third Row
+          {
+            name: "vatValue",
+            label: "Vat Value",
+            type: "number",
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "discount",
+            label: "Discount (%)",
+            type: "number",
+            className: "col-span-12 md:col-span-4",
+          },
+          {
+            name: "value",
+            label: "Value",
+            type: "number",
+            className: "col-span-12 md:col-span-4",
+          },
+        ],
+      },
     },
   };
 

@@ -6,9 +6,10 @@ const Table = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  className,
 }) => {
   return (
-    <div className="overflow-hidden">
+    <div className={`overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 ">
           <thead className="bg-gray-50">

@@ -7,6 +7,8 @@ const Autocomplete = ({
   fetchSuggestions,
   debounceTime = 300,
   disabled,
+  className,
+  placeholder,
 }) => {
   // Initialize with empty string, not with the value prop
   const [inputValue, setInputValue] = useState("");
@@ -78,9 +80,10 @@ const Autocomplete = ({
         value={inputValue || ""}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        className={`w-full p-2 border rounded ${disabled ? "bg-gray-100" : ""}`}
+        className={`${className}  ${disabled ? "bg-gray-100" : ""}`}
         autoComplete="off"
         disabled={disabled}
+        placeholder={placeholder || `Enter ${name}`}
       />
 
       {isLoading && (
@@ -95,8 +98,9 @@ const Autocomplete = ({
             <li
               key={item.id}
               onClick={() => handleSelect(item)}
-              className={`p-2 hover:bg-gray-100 cursor-pointer ${index === selectedIndex ? "bg-gray-100" : ""
-                }`}
+              className={`p-2 hover:bg-gray-100 cursor-pointer ${
+                index === selectedIndex ? "bg-gray-100" : ""
+              }`}
             >
               {item[name]}
             </li>

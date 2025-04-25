@@ -23,7 +23,7 @@ const FormField = ({
   } = field;
 
   const inputClasses =
-    "w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all";
+    "w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white disabled:bg-gray-100 disabled:cursor-not-allowed";
   const selectClasses =
     "w-full p-2.5 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all";
 
@@ -48,6 +48,7 @@ const FormField = ({
             onSelect={(item) => onAutocompleteSelect(name, item)}
             disabled={disabled}
             placeholder={placeholder || `Enter ${label}`}
+            className={inputClasses}
           />
         );
       case "select":

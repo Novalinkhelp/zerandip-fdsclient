@@ -24,6 +24,9 @@ import SalesRepMaster from "./pages/MasterFiles/SalesRepMaster";
 // import InvoiceMaster from "./pages/MasterFiles/InvoiceMaster";
 import ExpenseCategoryMaster from "./pages/MasterFiles/ExpenseCategoryMaster";
 import CustomerDiscountSlabs from "./pages/MasterFiles/CustomerDiscountSlabs";
+import InventoryAndStockInquiry from "./pages/InventoryAndStock/InventoryAndStockInquiry";
+import SalesTransactions from "./pages/SalesTransactions/SalesTransactions";
+import LedgerDataManagement from "./pages/FinanceAndAccounting/LedgerDataManagement";
 
 function App() {
   return (
@@ -127,6 +130,21 @@ function App() {
           <Route
             path="/master-data/reason-remarks-master"
             element={<ReasonRemarkMaster />}
+          />
+
+          {/* Inventory and Stock Inquiry */}
+          <Route
+            path="/inventory-stock"
+            element={<InventoryAndStockInquiry />}
+          />
+
+          {/* Sales and Transactions */}
+          <Route path="/sales-transactions" element={<SalesTransactions />} />
+
+          {/* Finance and Accounting */}
+          <Route
+            path="/finance-accounting"
+            element={<LedgerDataManagement />}
           />
         </Route>
       </Routes>
