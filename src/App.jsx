@@ -27,6 +27,23 @@ import CustomerDiscountSlabs from "./pages/MasterFiles/CustomerDiscountSlabs";
 import InventoryAndStockInquiry from "./pages/InventoryAndStock/InventoryAndStockInquiry";
 import SalesTransactions from "./pages/SalesTransactions/SalesTransactions";
 import LedgerDataManagement from "./pages/FinanceAndAccounting/LedgerDataManagement";
+import SalesRepVisit from "./pages/Schedules/SalesRepVisit";
+import RepWorkingSchedule from "./pages/FinanceAndAccounting/Schedules/RepWorkingSchedule";
+import DeliveryOutward from "./pages/FinanceAndAccounting/Deliveries/DeliveryOutward";
+import ChangeSellingPrice from "./pages/FinanceAndAccounting/Miscellaneous/ChangeSellingPrice";
+import LocationTransfer from "./pages/FinanceAndAccounting/Miscellaneous/LocationTransfer";
+import LocalPurchases from "./pages/FinanceAndAccounting/Miscellaneous/LocalPurchases";
+import VerifyBalance from "./pages/FinanceAndAccounting/Miscellaneous/VerifyBalance";
+import DebtorsLedgerWriteOffCheques from "./pages/FinanceAndAccounting/DebtorsLedger/DebtorsLedgerWriteOffCheques";
+import DebtorsLedgerDatingNonDatedCheques from "./pages/FinanceAndAccounting/DebtorsLedger/DebtorsLedgerDatingNonDatedCheques";
+import DebtorsLedgerOldPDReturnCheque from "./pages/FinanceAndAccounting/DebtorsLedger/DebtorsLedgerOldPDReturnCheque";
+import DebtorsLedgerDebitNote from "./pages/FinanceAndAccounting/DebtorsLedger/DebtorsLedgerDebitNote";
+import DebtorsLedgerCheques from "./pages/FinanceAndAccounting/DebtorsLedger/DebtorsLedgerCheques";
+import GeneralAccountsJournals from "./pages/FinanceAndAccounting/GeneralAccounts/GeneralAccountsJournals";
+import CustomerAccountsJournals from "./pages/FinanceAndAccounting/DebtorsLedger/CustomerAccountsJournals";
+import GeneralAccountsPayments from "./pages/FinanceAndAccounting/GeneralAccounts/GeneralAccountsPayments";
+import StandardReceipts from "./pages/FinanceAndAccounting/DebtorsLedger/StandardReceipts";
+import GeneralAccountReceipts from "./pages/FinanceAndAccounting/GeneralAccounts/GeneralAccountReceipts";
 
 function App() {
   return (
@@ -143,8 +160,79 @@ function App() {
 
           {/* Finance and Accounting */}
           <Route
-            path="/finance-accounting"
+            path="/finance-accounting/"
             element={<LedgerDataManagement />}
+          />
+
+          <Route
+            path="/finance-accounting/schedules/sales-rep-visit"
+            element={<SalesRepVisit />}
+          />
+          <Route
+            path="/finance-accounting/schedules/rep-daily-working-schedule"
+            element={<RepWorkingSchedule />}
+          />
+          <Route
+            path="/finance-accounting/delivery/delivery-outward"
+            element={<DeliveryOutward />}
+          />
+          <Route
+            path="/finance-accounting/miscellaneous/changing-selling-price"
+            element={<ChangeSellingPrice />}
+          />
+          <Route
+            path="/finance-accounting/miscellaneous/goods-issue-location-transfer"
+            element={<LocationTransfer />}
+          />
+          <Route
+            path="/finance-accounting/miscellaneous/local-purchases"
+            element={<LocalPurchases />}
+          />
+          <Route
+            path="/finance-accounting/miscellaneous/verify-balance-data-entry"
+            element={<VerifyBalance />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/write-off-post-dated-cheques"
+            element={<DebtorsLedgerWriteOffCheques />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/dating-non-dated-cheques"
+            element={<DebtorsLedgerDatingNonDatedCheques />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/old-pd-return-cheques"
+            element={<DebtorsLedgerOldPDReturnCheque />}
+          />
+
+          <Route
+            path="/finance-accounting/debtors-ledger/debit-note"
+            element={<DebtorsLedgerDebitNote />}
+          />
+
+          <Route
+            path="/finance-accounting/general-accounts/general-journals"
+            element={<GeneralAccountsJournals />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/customer-journals"
+            element={<CustomerAccountsJournals />}
+          />
+          <Route
+            path="/finance-accounting/general-accounts/payments"
+            element={<GeneralAccountsPayments />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/standard-receipts"
+            element={<StandardReceipts />}
+          />
+          <Route
+            path="/finance-accounting/general-accounts/receipts"
+            element={<GeneralAccountReceipts />}
+          />
+          <Route
+            path="/finance-accounting/debtors-ledger/cheque-details"
+            element={<DebtorsLedgerCheques />}
           />
         </Route>
       </Routes>

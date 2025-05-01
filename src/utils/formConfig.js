@@ -1,11 +1,309 @@
 import {
+  fetchBanks,
+  fetchBranches,
   fetchCustomers,
+  fetchExpenseCategories,
   fetchItems,
   fetchLocations,
+  fetchRoutes,
+  fetchReasonRemarks,
   fetchSalesReps,
+  fetchSuppliers,
 } from "./mockApi.js";
 
 export const getFormConfig = (recordType) => {
+  const baseGeneralReceiptsFields = [
+    //First row
+    {
+      name: "receiptType",
+      label: "Receipt Type",
+      type: "select",
+      options: [
+        { value: "N", label: "Normal" },
+        { value: "S", label: "Chq. Set" },
+        { value: "R", label: "Return Cheque" },
+      ],
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "receiptVoucherNumber",
+      label: "Receipt Voucher Number",
+      type: "text",
+      className: "col-span-12 md:col-span-6",
+    },
+    //Second row
+    {
+      name: "customerCode",
+      label: "Account Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchCustomers,
+      autofill: {
+        customerCode: "customerCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "dateOfEntry",
+      label: "Date of Entry",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    //Third row
+    {
+      name: "modeOfPayment",
+      label: "Mode of Payment",
+      type: "select",
+      options: [
+        { value: "C", label: "Cash" },
+        { value: "Q", label: "Cheque" },
+      ],
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "amount",
+      label: "Amount",
+      type: "number",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
+  const cashSpecificGeneralReceiptsFields = [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      required: true,
+      className: "col-span-12",
+    },
+  ];
+
+  const normalChequeSpecificGeneralReceiptsFields = [
+    {
+      name: "chequeNumber",
+      label: "Cheque Number",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      required: true,
+      className: "col-span-12",
+    },
+  ];
+
+  const baseChequeSpecificGeneralReceiptsFields = [
+    {
+      name: "accountNumber",
+      label: "Account Number",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "chequeNumber",
+      label: "Cheque Number",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "bankCode",
+      label: "Bank",
+      type: "autocomplete",
+      fetchSuggestions: fetchBanks,
+      autofill: {
+        bankCode: "bankCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "branchCode",
+      label: "Branch",
+      type: "autocomplete",
+      fetchSuggestions: fetchBranches,
+      autofill: {
+        branchCode: "branchCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "repCode",
+      label: "Rep",
+      type: "autocomplete",
+      fetchSuggestions: fetchSalesReps,
+      autofill: {
+        repCode: "repCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
+  const returnChequeSpecificGeneralReceiptsFields = [
+    {
+      name: "reasonRemarkCode",
+      label: "Reason",
+      type: "autocomplete",
+      fetchSuggestions: fetchReasonRemarks,
+      autofill: {
+        reasonRemarkCode: "reasonRemarkCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "isSameReturnCheque",
+      label: "Return the same cheque?",
+      type: "checkbox",
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
+  const generalAccountsPaymentsBaseFields = [
+    {
+      name: "paymentType",
+      label: "Payment Type",
+      type: "select",
+      options: [
+        { value: "B", label: "Bank Deposit" },
+        { value: "N", label: "Normal" },
+      ],
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "customerCode",
+      label: "Account Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchCustomers,
+      autofill: {
+        customerCode: "customerCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "modeOfPayment",
+      label: "Mode of Payment",
+      type: "select",
+      options: [
+        { value: "C", label: "Cash" },
+        { value: "Q", label: "Cheque" },
+      ],
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "dateOfEntry",
+      label: "Date of Entry",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "accountNumber",
+      label: "Account Number",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "repCode",
+      label: "Rep",
+      type: "autocomplete",
+      fetchSuggestions: fetchSalesReps,
+      autofill: {
+        repCode: "repCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "amount",
+      label: "Amount",
+      type: "number",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      required: true,
+      className: "col-span-12",
+    },
+  ];
+
+  const generalAccountsPaymentsBankDepSpecificFields = [
+    {
+      name: "bankCode",
+      label: "Bank Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchBanks,
+      autofill: {
+        bankCode: "bankCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "branchCode",
+      label: "Branch Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchBranches,
+      autofill: {
+        branchCode: "branchCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
+  const generalAccountsPaymentsNormalSpecificFields = [
+    {
+      name: "routeCode",
+      label: "Route Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchRoutes,
+      autofill: {
+        routeCode: "routeCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+    {
+      name: "expenseCategoryCode",
+      label: "Expense Code",
+      type: "autocomplete",
+      fetchSuggestions: fetchExpenseCategories,
+      autofill: {
+        expenseCategoryCode: "expenseCategoryCode",
+      },
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
+  const generalAccountsPaymentsChequeSpecificFields = [
+    {
+      name: "chequeNumber",
+      label: "Cheque Number",
+      type: "text",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
+  ];
+
   const configs = {
     company: {
       title: "Company",
@@ -3197,6 +3495,1499 @@ export const getFormConfig = (recordType) => {
             label: "Value",
             type: "number",
             className: "col-span-12 md:col-span-4",
+          },
+        ],
+      },
+    },
+    generalAccountReceipts: {
+      cash: {
+        title: "Cash Account Receipts",
+        useTabs: false,
+        fields: [
+          ...baseGeneralReceiptsFields,
+          ...cashSpecificGeneralReceiptsFields,
+        ],
+      },
+      normalCheque: {
+        title: "Normal Cheque",
+        useTabs: false,
+        fields: [
+          ...baseGeneralReceiptsFields,
+          ...normalChequeSpecificGeneralReceiptsFields,
+        ],
+      },
+      settleCheque: {
+        title: "Settle Cheque",
+        useTabs: false,
+        fields: [
+          ...baseGeneralReceiptsFields,
+          ...baseChequeSpecificGeneralReceiptsFields,
+        ],
+      },
+      returnCheque: {
+        title: "Return Cheque",
+        useTabs: false,
+        fields: [
+          ...baseGeneralReceiptsFields,
+          ...baseChequeSpecificGeneralReceiptsFields,
+          ...returnChequeSpecificGeneralReceiptsFields,
+        ],
+      },
+    },
+    standardReceipts: {
+      customer: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          //First Row
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              customerName: "customerName",
+              address: "customerAddress",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second Row
+          {
+            name: "address",
+            label: "Address",
+            type: "textarea",
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      receipt: {
+        title: "Receipt Details",
+        useTabs: false,
+        fields: [
+          //First row
+          {
+            name: "receiptNumber",
+            label: "Receipt Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second row
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third row
+          {
+            name: "modeOfPayment",
+            label: "Mode of Payment",
+            type: "select",
+            options: [
+              { value: "C", label: "Cash" },
+              { value: "Q", label: "Cheque" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "amount",
+            label: "Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Forth row
+          {
+            name: "advanced",
+            label: "Advanced (Y/N)",
+            type: "checkbox",
+            className: "col-span-12 md:col-span-6",
+          },
+          //Fifth row
+          {
+            name: "description",
+            label: "Description",
+            type: "textarea",
+            required: true,
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    generalAccountsPayments: {
+      bankDepositCash: {
+        title: "Cash Payment Details",
+        useTabs: false,
+        fields: [
+          ...generalAccountsPaymentsBaseFields,
+          ...generalAccountsPaymentsBankDepSpecificFields,
+        ],
+      },
+      bankDepositCheque: {
+        title: "Cheque Payment Details",
+        useTabs: false,
+        fields: [
+          ...generalAccountsPaymentsBaseFields,
+          ...generalAccountsPaymentsChequeSpecificFields,
+          ...generalAccountsPaymentsBankDepSpecificFields,
+        ],
+      },
+      normalPayment: {
+        title: "Normal Payment Details",
+        useTabs: false,
+        fields: [
+          ...generalAccountsPaymentsBaseFields,
+          ...generalAccountsPaymentsNormalSpecificFields,
+        ],
+      },
+    },
+    journal: {
+      title: "Journal Details",
+      useTabs: false,
+      fields: [
+        //First row
+        {
+          name: "dateOfEntry",
+          label: "Date of Entry",
+          type: "text",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "amount",
+          label: "Amount",
+          type: "number",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        //Second row
+        //WARNING: there is a bug in autocomplete that the name of the field must be the same as one we are fetching.
+        //This works fine in others but here we have two that uses the same autocomplete
+        {
+          name: "debitAccount",
+          label: "Debit Account",
+          type: "text",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "creditAccount",
+          label: "Credit Account",
+          type: "text",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        //Third row
+        {
+          name: "description",
+          label: "Description",
+          type: "textarea",
+          className: "col-span-12",
+        },
+      ],
+    },
+    debtorsLedgerDebitNote: {
+      customer: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              customerName: "customerName",
+              customerAddress: "customerAddress",
+              contactNumber: "telephone",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "contactNumber",
+            label: "Contact Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerAddress",
+            label: "Address",
+            type: "textarea",
+            required: true,
+            className: "col-span-12",
+          },
+        ],
+      },
+      debitNote: {
+        title: "Debit Note Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "debitNoteNumber",
+            label: "Debit Note Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Salesman Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "amount",
+            label: "Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "description",
+            label: "Description",
+            type: "textarea",
+            required: false,
+            className: "col-span-12",
+          },
+          {
+            name: "returnCheque",
+            label: "Return Cheque (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+          {
+            name: "updateSalesACC",
+            label: "Update Sales ACC. in General Accounts (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    oldPDReturnCheques: {
+      receipt: {
+        title: "Receipt Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "receiptNumber",
+            label: "Receipt Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      cheque: {
+        title: "Cheque Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "chequeNumber",
+            label: "Cheque Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "depositDate",
+            label: "Deposit Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "bankCode",
+            label: "Bank",
+            type: "autocomplete",
+            fetchSuggestions: fetchBanks,
+            autofill: {
+              bankCode: "bankCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "branchCode",
+            label: "Branch",
+            type: "autocomplete",
+            fetchSuggestions: fetchBranches,
+            autofill: {
+              branchCode: "branchCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "accountNumber",
+            label: "Account Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "amount",
+            label: "Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "returnCheque",
+            label: "Return Cheque (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    nonDatedCheques: {
+      receipt: {
+        title: "Receipt Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              customerName: "customerName",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "nonDatedChequeAmount",
+            label: "Non Dated Cheque Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      cheque: {
+        title: "Cheque Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "chequeNumber",
+            label: "Cheque Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "depositDate",
+            label: "Deposit Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "bankCode",
+            label: "Bank",
+            type: "autocomplete",
+            fetchSuggestions: fetchBanks,
+            autofill: {
+              bankCode: "bankCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "branchCode",
+            label: "Branch",
+            type: "autocomplete",
+            fetchSuggestions: fetchBranches,
+            autofill: {
+              branchCode: "branchCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "accountNumber",
+            label: "Account Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "receiptNumber",
+            label: "Receipt Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "amount",
+            label: "Cheque Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    writeOffCheques: {
+      receipt: {
+        title: "Customer Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              customerName: "customerName",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerName",
+            label: "Customer Name",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "chequeType",
+            label: "Cheque Type",
+            type: "select",
+            options: [
+              { value: "P", label: "P" },
+              { value: "R", label: "R" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      cheque: {
+        title: "Cheque Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "chequeNumber",
+            label: "Cheque Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "depositDate",
+            label: "Deposit Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "bankCode",
+            label: "Bank",
+            type: "autocomplete",
+            fetchSuggestions: fetchBanks,
+            autofill: {
+              bankCode: "bankCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "branchCode",
+            label: "Branch",
+            type: "autocomplete",
+            fetchSuggestions: fetchBranches,
+            autofill: {
+              branchCode: "branchCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "chequeAmount",
+            label: "Cheque Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "receiptNumber",
+            label: "Receipt Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "accountNumber",
+            label: "Account Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "remRec",
+            label: "Rem Rec",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    debtorsLedgerCheques: {
+      receipt: {
+        title: "Receipt Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "receiptNumber",
+            label: "Receipt Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      cheque: {
+        title: "Cheque Details",
+        useTabs: false,
+        fields: [
+          //First row
+          {
+            name: "chequeNumber",
+            label: "Cheque Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerCode",
+            label: "Customer Account Number",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Second row
+          {
+            name: "bankCode",
+            label: "Bank Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchBanks,
+            autofill: {
+              bankCode: "bankCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "branchCode",
+            label: "Branch Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchBranches,
+            autofill: {
+              branchCode: "branchCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Third row
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "depositDate",
+            label: "Deposit Date",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          //Fourth row
+          {
+            name: "amount",
+            label: "Amount",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "nonDated",
+            label: "Non-Dated",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    verifyBalance: {
+      title: "Verify Balance",
+      useTabs: false,
+      fields: [
+        {
+          name: "locationCode",
+          label: "Location Code",
+          type: "autocomplete",
+          fetchSuggestions: fetchLocations,
+          autofill: {
+            locationCode: "locationCode",
+          },
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "itemCode",
+          label: "Item Code",
+          type: "autocomplete",
+          fetchSuggestions: fetchItems,
+          autofill: {
+            itemCode: "itemCode",
+          },
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "wsActual",
+          label: "W/S Actual",
+          type: "number",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "rsActual",
+          label: "R/S Actual",
+          type: "number",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    localPurchases: {
+      supplier: {
+        title: "Supplier Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "supplierCode",
+            label: "Supplier Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSuppliers,
+            autofill: {
+              supplierCode: "supplierCode",
+              supplierName: "supplierName",
+              supplierAddress: "address",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "supplierName",
+            label: "Supplier Name",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "orderNumber",
+            label: "Order Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "cashCredit",
+            label: "Cash / Credit",
+            type: "select",
+            options: [
+              { value: "C", label: "Cash" },
+              { value: "Cr", label: "Credit" },
+            ],
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "orderDate",
+            label: "Order Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "supplierAddress",
+            label: "Supplier Address",
+            type: "textarea",
+            required: true,
+            className: "col-span-12",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            autofill: {
+              itemCode: "itemCode",
+              unitPrice: "marketPrice",
+              quantityInHand: "rsQuantityInHand",
+              sellingPrice: "sellingPrice",
+              netItem: "netItem",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "unitPrice",
+            label: "Unit Price",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityInHand",
+            label: "Quantity In Hand",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantityPurchased",
+            label: "Quantity Purchased",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "sellingPrice",
+            label: "Selling Price",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "netValue",
+            label: "Net Value",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "netItem",
+            label: "Net Item (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    locationTransfer: {
+      transaction: {
+        title: "Transaction Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "referenceNumber",
+            label: "Reference Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "locationFrom",
+            label: "Location From",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "locationTo",
+            label: "Location To",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      item: {
+        title: "Item Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "itemCode",
+            label: "Item Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            autofill: {
+              itemCode: "itemCode",
+              itemDescription: "itemDescription",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "itemDescription",
+            label: "Item Description",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "quantity",
+            label: "Quantity",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+    },
+    changeSellingPrice: {
+      title: "Change Selling Price",
+      useTabs: false,
+      fields: [
+        {
+          name: "type",
+          label: "Type",
+          type: "select",
+          options: [
+            { value: "PR", label: "By Price" },
+            { value: "PG", label: "By Percentage" },
+          ],
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "dateOfEntry",
+          label: "Date of Entry",
+          type: "date",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "itemCodeFrom",
+          label: "Item Code From",
+          type: "text",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "itemCodeTo",
+          label: "Item Code To",
+          type: "text",
+          required: true,
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    deliveryOutward: {
+      generalDelivery: {
+        title: "Delivery Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "deliveryOutwardNumber",
+            label: "Delivery Outward Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "visitNumber",
+            label: "Visit Number",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "itemCode",
+            label: "To Be Delivered",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            autofill: {
+              itemCode: "itemCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "byHand",
+            label: "By Hand (Y/N)",
+            type: "checkbox",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "isAtCustomerLocation",
+            label: "Is Conducted At Customer Location (Y/N)",
+            type: "checkbox",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "byHandName",
+            label: "By Hand Name",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "orderDelivered",
+            label: "Order Delivered",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+        ],
+      },
+      transport: {
+        title: "Transport Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "zmeDelivery",
+            label: "ZME Delivery (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+          {
+            name: "vehicleNumber",
+            label: "Vehicle Number #",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "nameNumber",
+            label: "Name",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "transportAgent",
+            label: "Transport Agent (Y/N)",
+            type: "checkbox",
+            className: "col-span-12",
+          },
+          {
+            name: "doNumber",
+            label: "DO. Number",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "byName",
+            label: "By Name",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "vNumber",
+            label: "V. Number",
+            type: "number",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "zmeIssuedBy",
+            label: "ZME Issued by",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "zmeTakenBy",
+            label: "ZME Taken by",
+            type: "text",
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+
+      parcelDelivery: {
+        title: "Delivery Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "deliveryOutwardNumber",
+            label: "Delivery Outward Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "visitNumber",
+            label: "Visit Number",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "itemCode",
+            label: "To Be Delivered",
+            type: "autocomplete",
+            fetchSuggestions: fetchItems,
+            autofill: {
+              itemCode: "itemCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      invoice: {
+        title: "Invoice Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "invoiceNumber",
+            label: "Invoice Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "invoiceDate",
+            label: "Invoice Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "numberOfParcels",
+            label: "No. of Parcels",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "parcelNumbers",
+            label: "Parcel Numbers",
+            type: "textarea",
+            required: true,
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    repWorkingSchedule: {
+      rep: {
+        title: "Rep Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "visitNumber",
+            label: "Visit Number",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "driver",
+            label: "Driver",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "vehicleNumber",
+            label: "Vehicle Number",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      dailyWork: {
+        title: "Daily Work Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              creditLimit: "creditLimit",
+              customerAddress: "customerAddress",
+              areaCode: "areaCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "areaCode",
+            label: "Area Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "target",
+            label: "Target",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "creditLimit",
+            label: "Credit Limit",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "timeFrom",
+            label: "Time From",
+            type: "time",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "timeTo",
+            label: "Time To",
+            type: "time",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "reasonRemarkCode",
+            label: "Remarks",
+            type: "autocomplete",
+            fetchSuggestions: fetchReasonRemarks,
+            autofill: {
+              reasonRemarkCode: "reasonRemarkCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "customerAddress",
+            label: "Address",
+            type: "textarea",
+            required: true,
+            className: "col-span-12",
+          },
+        ],
+      },
+    },
+    salesRepVisit: {
+      rep: {
+        title: "Rep Visit Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "repCode",
+            label: "Rep Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchSalesReps,
+            autofill: {
+              repCode: "repCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "visitNo",
+            label: "Visit No.",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "dateOfEntry",
+            label: "Date of Entry",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "returnDate",
+            label: "Return Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "routeCode",
+            label: "Route Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchRoutes,
+            autofill: {
+              routeCode: "routeCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+        ],
+      },
+      visit: {
+        title: "Visit Target Details",
+        useTabs: false,
+        fields: [
+          {
+            name: "customerCode",
+            label: "Customer Code",
+            type: "autocomplete",
+            fetchSuggestions: fetchCustomers,
+            autofill: {
+              customerCode: "customerCode",
+              creditLimit: "creditLimit",
+              areaCode: "areaCode",
+            },
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "areaCode",
+            label: "Area Code",
+            type: "text",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "target",
+            label: "Target",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "creditLimit",
+            label: "Credit Limit",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "achievement",
+            label: "Achievement",
+            type: "number",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "visitDate",
+            label: "Visit Date",
+            type: "date",
+            required: true,
+            className: "col-span-12 md:col-span-6",
+          },
+          {
+            name: "select",
+            label: "Select",
+            type: "checkbox",
+            className: "col-span-12 md:col-span-6",
           },
         ],
       },

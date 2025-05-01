@@ -3581,6 +3581,151 @@ const mockLocationWiseItems = [
   },
 ];
 
+// Add this to your mockApi.js file
+
+const mockItemComputedQuantities = [
+  {
+    id: 1,
+    itemCode: "ENG-SP-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 35,
+    wsComputed: 52,
+  },
+  {
+    id: 2,
+    itemCode: "ENG-SP-001",
+    locationCode: "LOC-KAN-001",
+    rsComputed: 18,
+    wsComputed: 27,
+  },
+  {
+    id: 3,
+    itemCode: "ENG-SP-001",
+    locationCode: "LOC-GAL-001",
+    rsComputed: 9,
+    wsComputed: 14,
+  },
+  {
+    id: 4,
+    itemCode: "ENG-OF-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 48,
+    wsComputed: 72,
+  },
+  {
+    id: 5,
+    itemCode: "ENG-OF-001",
+    locationCode: "LOC-KAN-001",
+    rsComputed: 25,
+    wsComputed: 40,
+  },
+  {
+    id: 6,
+    itemCode: "ENG-OF-001",
+    locationCode: "LOC-JAF-001",
+    rsComputed: 15,
+    wsComputed: 23,
+  },
+  {
+    id: 7,
+    itemCode: "BRK-PAD-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 24,
+    wsComputed: 41,
+  },
+  {
+    id: 8,
+    itemCode: "BRK-PAD-001",
+    locationCode: "LOC-ANR-001",
+    rsComputed: 12,
+    wsComputed: 20,
+  },
+  {
+    id: 9,
+    itemCode: "COOL-RAD-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 0,
+    wsComputed: 18,
+  },
+  {
+    id: 10,
+    itemCode: "COOL-RAD-001",
+    locationCode: "LOC-COL-002",
+    rsComputed: 0,
+    wsComputed: 4,
+  },
+  {
+    id: 11,
+    itemCode: "ELEC-ALT-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 0,
+    wsComputed: 15,
+  },
+  {
+    id: 12,
+    itemCode: "ELEC-ALT-001",
+    locationCode: "LOC-KUR-001",
+    rsComputed: 0,
+    wsComputed: 6,
+  },
+  {
+    id: 13,
+    itemCode: "FUEL-PMP-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 12,
+    wsComputed: 20,
+  },
+  {
+    id: 14,
+    itemCode: "FUEL-PMP-001",
+    locationCode: "LOC-MAT-001",
+    rsComputed: 5,
+    wsComputed: 8,
+  },
+  {
+    id: 15,
+    itemCode: "SUSP-KIT-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 0,
+    wsComputed: 10,
+  },
+  {
+    id: 16,
+    itemCode: "SUSP-KIT-001",
+    locationCode: "LOC-COL-003",
+    rsComputed: 0,
+    wsComputed: 3,
+  },
+  {
+    id: 17,
+    itemCode: "TRANS-CL-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 7,
+    wsComputed: 13,
+  },
+  {
+    id: 18,
+    itemCode: "TRANS-CL-001",
+    locationCode: "LOC-NEG-001",
+    rsComputed: 3,
+    wsComputed: 5,
+  },
+  {
+    id: 19,
+    itemCode: "ENG-AF-001",
+    locationCode: "LOC-COL-001",
+    rsComputed: 19,
+    wsComputed: 29,
+  },
+  {
+    id: 20,
+    itemCode: "ENG-AF-001",
+    locationCode: "LOC-GAL-001",
+    rsComputed: 9,
+    wsComputed: 13,
+  },
+];
+
 export const fetchCompanies = async (query = "") => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -3898,4 +4043,22 @@ export const fetchLocationWiseItems = async (query = "") => {
   }
 
   return mockLocationWiseItems.filter((item) => item.itemCode === query);
+};
+
+export const fetchItemComputedQuantities = async (itemCode, locationCode) => {
+  console.log(itemCode, locationCode);
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  if (!itemCode || !locationCode) {
+    return [];
+  }
+
+  const verifiedItem = mockItemComputedQuantities.find(
+    (item) => item.itemCode === itemCode && item.locationCode === locationCode
+  );
+
+  return {
+    rsComputed: verifiedItem.rsComputed,
+    wsComputed: verifiedItem.wsComputed,
+  };
 };

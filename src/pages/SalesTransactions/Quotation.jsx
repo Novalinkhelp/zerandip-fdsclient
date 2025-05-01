@@ -217,15 +217,17 @@ const Quotation = () => {
         </div>
       ) : (
         <>
-          <Table
-            data={items}
-            columns={columns}
-            currentPage={1}
-            totalPages={1}
-            onPageChange={(page) => {
-              console.log(`Page changed to ${page}`);
-            }}
-          />
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <Table
+              data={items}
+              columns={columns}
+              currentPage={1}
+              totalPages={1}
+              onPageChange={(page) => {
+                console.log(`Page changed to ${page}`);
+              }}
+            />
+          </div>
 
           <div className="flex flex-col gap-4 p-6  bg-gray-100 rounded-lg">
             <InvoiceSummary

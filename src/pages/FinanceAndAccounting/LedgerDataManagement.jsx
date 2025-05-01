@@ -65,6 +65,11 @@ const LedgerDataManagement = () => {
           icon: <FileText className="w-4 h-4" />,
         },
         {
+          name: "Dating Non - Dated Cheques",
+          path: "/finance-accounting/debtors-ledger/dating-non-dated-cheques",
+          icon: <FileText className="w-4 h-4" />,
+        },
+        {
           name: "Write Off Post - Dated Cheques",
           path: "/finance-accounting/debtors-ledger/write-off-post-dated-cheques",
           icon: <FileText className="w-4 h-4" />,
@@ -104,11 +109,6 @@ const LedgerDataManagement = () => {
           name: "Delivery Outward",
           path: "/finance-accounting/delivery/delivery-outward",
           icon: <Truck className="w-4 h-4" />,
-        },
-        {
-          name: "Dating Non - Dated Cheques",
-          path: "/finance-accounting/delivery/dating-non-dated-cheques",
-          icon: <FileText className="w-4 h-4" />,
         },
       ],
     },

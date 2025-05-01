@@ -255,16 +255,18 @@ const CashSales = () => {
         </div>
       ) : (
         <>
-          <Table
-            data={items}
-            columns={columns}
-            currentPage={1}
-            totalPages={1}
-            onPageChange={(page) => {
-              console.log(`Page changed to ${page}`);
-            }}
-            className="bg-white"
-          />
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <Table
+              data={items}
+              columns={columns}
+              currentPage={1}
+              totalPages={1}
+              onPageChange={(page) => {
+                console.log(`Page changed to ${page}`);
+              }}
+              className="bg-white"
+            />
+          </div>
 
           <div className="flex flex-col gap-4 p-6  bg-gray-100 rounded-lg">
             <InvoiceSummary
