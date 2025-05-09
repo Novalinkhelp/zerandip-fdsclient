@@ -19,10 +19,11 @@ export const getFormConfig = (recordType) => {
       label: "Receipt Type",
       type: "select",
       options: [
-        { value: "N", label: "Normal" },
-        { value: "S", label: "Chq. Set" },
-        { value: "R", label: "Return Cheque" },
+        { value: "N", label: "N - Normal" },
+        { value: "S", label: "S - Settlement Cheque" },
+        { value: "R", label: "R - Return Cheque" },
       ],
+      defaultValue: "N",
       required: true,
       className: "col-span-12 md:col-span-6",
     },
@@ -35,7 +36,7 @@ export const getFormConfig = (recordType) => {
     //Second row
     {
       name: "customerCode",
-      label: "Account Code",
+      label: "Customer Code",
       type: "autocomplete",
       fetchSuggestions: fetchCustomers,
       autofill: {
@@ -47,7 +48,7 @@ export const getFormConfig = (recordType) => {
     {
       name: "dateOfEntry",
       label: "Date of Entry",
-      type: "text",
+      type: "date",
       required: true,
       className: "col-span-12 md:col-span-6",
     },
@@ -57,9 +58,10 @@ export const getFormConfig = (recordType) => {
       label: "Mode of Payment",
       type: "select",
       options: [
-        { value: "C", label: "Cash" },
-        { value: "Q", label: "Cheque" },
+        { value: "C", label: "C - Cash" },
+        { value: "Q", label: "Q - Cheque" },
       ],
+      defaultValue: "C",
       required: true,
       className: "col-span-12 md:col-span-6",
     },
@@ -147,6 +149,13 @@ export const getFormConfig = (recordType) => {
       required: true,
       className: "col-span-12 md:col-span-6",
     },
+    {
+      name: "depositDate",
+      label: "Deposit Date",
+      type: "date",
+      required: true,
+      className: "col-span-12 md:col-span-6",
+    },
   ];
 
   const returnChequeSpecificGeneralReceiptsFields = [
@@ -165,7 +174,7 @@ export const getFormConfig = (recordType) => {
       name: "isSameReturnCheque",
       label: "Return the same cheque?",
       type: "checkbox",
-      className: "col-span-12 md:col-span-6",
+      className: "col-span-12",
     },
   ];
 
@@ -176,6 +185,7 @@ export const getFormConfig = (recordType) => {
       type: "select",
       options: [
         { value: "B", label: "Bank Deposit" },
+        { value: "R", label: "Rep" },
         { value: "N", label: "Normal" },
       ],
       required: true,
@@ -206,7 +216,7 @@ export const getFormConfig = (recordType) => {
     {
       name: "dateOfEntry",
       label: "Date of Entry",
-      type: "text",
+      type: "date",
       required: true,
       className: "col-span-12 md:col-span-6",
     },
@@ -497,6 +507,85 @@ export const getFormConfig = (recordType) => {
             },
           ],
         },
+        {
+          label: "Company Accounts",
+          fields: [
+            //First row
+            {
+              name: "generalLedgerFilesDirectory",
+              label: "General Ledger Files Directory",
+              type: "text",
+              required: true,
+              placeholder: "Enter directory for general ledger files",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "mainCashAccount",
+              label: "Main Cash Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter main cash account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            //Second row
+            {
+              name: "cashSalesAccount",
+              label: "Cash Sales Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter cash sales account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "creditSalesAccount",
+              label: "Credit Sales Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter credit sales account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "pettyCashAccount",
+              label: "Petty Cash Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter petty cash account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "debtorsControlAccount",
+              label: "Debtors Control Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter debtors control account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "purchaseControlAccount",
+              label: "Purchase Control Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter purchase control account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "debtorsCollection",
+              label: "Debtors Collection",
+              type: "text",
+              required: true,
+              placeholder: "Debtors collection account number",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "purchaseAccount",
+              label: "Purchase Account",
+              type: "text",
+              required: true,
+              placeholder: "Enter purchase account number",
+              className: "col-span-12 md:col-span-6",
+            },
+          ],
+        },
       ],
     },
     customer: {
@@ -526,7 +615,7 @@ export const getFormConfig = (recordType) => {
             // Second row
             {
               name: "type",
-              label: "Type",
+              label: "D – Customer / G – General Ledger",
               type: "select",
               options: [
                 { value: "D-Customer", label: "D-Customer" },
@@ -545,14 +634,14 @@ export const getFormConfig = (recordType) => {
             // Third row
             {
               name: "nic",
-              label: "NIC",
+              label: "NIC#",
               type: "text",
               placeholder: "Enter NIC number",
               className: "col-span-12 md:col-span-6",
             },
             {
               name: "withHoldingTax",
-              label: "With Holding Tax",
+              label: "Withholding Tax",
               type: "number",
               placeholder: "Enter withholding tax percentage",
               className: "col-span-12 md:col-span-6",
@@ -742,19 +831,19 @@ export const getFormConfig = (recordType) => {
               className: "col-span-12 md:col-span-2",
             },
             {
-              name: "accountCode1",
-              label: "Account Code",
-              type: "text",
-              required: true,
-              placeholder: "Enter account code for account 1",
-              className: "col-span-12 md:col-span-5",
-            },
-            {
               name: "bankCode1",
               label: "Bank Code",
               type: "text",
               required: true,
               placeholder: "Enter bank code for account 1",
+              className: "col-span-12 md:col-span-5",
+            },
+            {
+              name: "accountCode1",
+              label: "Account Code",
+              type: "text",
+              required: true,
+              placeholder: "Enter account code for account 1",
               className: "col-span-12 md:col-span-5",
             },
             // Second row
@@ -767,19 +856,17 @@ export const getFormConfig = (recordType) => {
               className: "col-span-12 md:col-span-2",
             },
             {
-              name: "accountCode2",
-              label: "Account Code",
-              type: "text",
-              required: true,
-              placeholder: "Enter account code for account 2",
-              className: "col-span-12 md:col-span-5",
-            },
-            {
               name: "bankCode2",
               label: "Bank Code",
               type: "text",
-              required: true,
               placeholder: "Enter bank code for account 2",
+              className: "col-span-12 md:col-span-5",
+            },
+            {
+              name: "accountCode2",
+              label: "Account Code",
+              type: "text",
+              placeholder: "Enter account code for account 2",
               className: "col-span-12 md:col-span-5",
             },
             // Third row
@@ -792,19 +879,17 @@ export const getFormConfig = (recordType) => {
               className: "col-span-12 md:col-span-2",
             },
             {
-              name: "accountCode3",
-              label: "Account Code",
-              type: "text",
-              required: true,
-              placeholder: "Enter account code for account 3",
-              className: "col-span-12 md:col-span-5",
-            },
-            {
               name: "bankCode3",
               label: "Bank Code",
               type: "text",
-              required: true,
               placeholder: "Enter bank code for account 3",
+              className: "col-span-12 md:col-span-5",
+            },
+            {
+              name: "accountCode3",
+              label: "Account Code",
+              type: "text",
+              placeholder: "Enter account code for account 3",
               className: "col-span-12 md:col-span-5",
             },
             // Fourth row
@@ -817,19 +902,17 @@ export const getFormConfig = (recordType) => {
               className: "col-span-12 md:col-span-2",
             },
             {
-              name: "accountCode4",
-              label: "Account Code",
-              type: "text",
-              required: true,
-              placeholder: "Enter account code for account 4",
-              className: "col-span-12 md:col-span-5",
-            },
-            {
               name: "bankCode4",
               label: "Bank Code",
               type: "text",
-              required: true,
               placeholder: "Enter bank code for account 4",
+              className: "col-span-12 md:col-span-5",
+            },
+            {
+              name: "accountCode4",
+              label: "Account Code",
+              type: "text",
+              placeholder: "Enter account code for account 4",
               className: "col-span-12 md:col-span-5",
             },
           ],
@@ -997,11 +1080,12 @@ export const getFormConfig = (recordType) => {
             // Second row
             {
               name: "supplierType",
-              label: "Supplier Type",
+              label: "Cash / Credit / Both",
               type: "select",
               options: [
-                { value: "dCustomer", label: "D-Customer" },
-                { value: "dSupplier", label: "D-Supplier" },
+                { value: "cash", label: "Cash" },
+                { value: "credit", label: "Credit" },
+                { value: "both", label: "Both" },
               ],
               placeholder: "Select supplier type",
               className: "col-span-12 md:col-span-6",
@@ -1186,6 +1270,13 @@ export const getFormConfig = (recordType) => {
               label: "SWIFT Code",
               type: "text",
               placeholder: "Enter SWIFT code",
+              className: "col-span-12 md:col-span-6",
+            },
+            {
+              name: "accountCode",
+              label: "Account Code",
+              type: "text",
+              placeholder: "Enter Account code",
               className: "col-span-12 md:col-span-6",
             },
             //Forth Row
@@ -1549,8 +1640,8 @@ export const getFormConfig = (recordType) => {
       fields: [
         //First Row
         {
-          name: "item",
-          label: "Item",
+          name: "itemCode",
+          label: "Item Code",
           type: "text",
           placeholder: "Enter item name",
           required: true,
@@ -1695,10 +1786,12 @@ export const getFormConfig = (recordType) => {
           label: "Category",
           type: "select",
           options: [
-            { value: "Q", label: "Q - Return Cheque" },
             { value: "P", label: "P - Pending Invoice" },
             { value: "I", label: "I - Return Item" },
+            { value: "R", label: "R - Reject Item" },
+            { value: "Q", label: "Q - Return Cheque" },
           ],
+          placeholder: "Select category",
           required: true,
           className: "col-span-12 md:col-span-6",
         },
@@ -2118,7 +2211,7 @@ export const getFormConfig = (recordType) => {
       ],
     },
     itemWholeSaleSlabs: {
-      title: "Item Whole Sale Slabs",
+      title: "Item Wholesales Slabs",
       useTabs: true,
       tabs: [
         {
@@ -2554,11 +2647,11 @@ export const getFormConfig = (recordType) => {
               className: "col-span-12 md:col-span-6",
             },
             {
-              name: "itemDescription",
-              label: "Item Description",
+              name: "itemRemarks",
+              label: "Item Remarks",
               type: "text",
               required: true,
-              placeholder: "Enter item description",
+              placeholder: "Enter item remarks",
               className: "col-span-12 md:col-span-6",
             },
             // Third row
@@ -2619,10 +2712,10 @@ export const getFormConfig = (recordType) => {
             },
             // Sixth row
             {
-              name: "description",
-              label: "Description",
+              name: "remarks",
+              label: "Remarks",
               type: "textarea",
-              placeholder: "Enter item description",
+              placeholder: "Enter item remarks",
               className: "col-span-12",
             },
             // Seventh row
@@ -3583,7 +3676,7 @@ export const getFormConfig = (recordType) => {
           {
             name: "dateOfEntry",
             label: "Date of Entry",
-            type: "text",
+            type: "date",
             required: true,
             className: "col-span-12 md:col-span-6",
           },
@@ -3666,6 +3759,15 @@ export const getFormConfig = (recordType) => {
         useTabs: false,
         fields: [
           ...generalAccountsPaymentsBaseFields,
+          ...generalAccountsPaymentsNormalSpecificFields,
+        ],
+      },
+      normalChequePayment: {
+        title: "Normal Cheque Payment Details",
+        useTabs: false,
+        fields: [
+          ...generalAccountsPaymentsBaseFields,
+          ...generalAccountsPaymentsChequeSpecificFields,
           ...generalAccountsPaymentsNormalSpecificFields,
         ],
       },
@@ -3778,7 +3880,7 @@ export const getFormConfig = (recordType) => {
           {
             name: "dateOfEntry",
             label: "Date of Entry",
-            type: "text",
+            type: "date",
             required: true,
             className: "col-span-12 md:col-span-6",
           },
@@ -4991,6 +5093,259 @@ export const getFormConfig = (recordType) => {
           },
         ],
       },
+    },
+    userSystemManagement: {
+      title: "User System Management",
+      useTabs: false,
+      fields: [
+        {
+          name: "deactivate",
+          label: "Deactivate",
+          type: "checkbox",
+          className: "col-span-12",
+        },
+        {
+          name: "viewType",
+          label: "View Type",
+          type: "select",
+          options: [
+            { value: "view", label: "View" },
+            { value: "hide", label: "Hide" },
+          ],
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "repCode",
+          label: "Staff / User",
+          type: "autocomplete",
+          fetchSuggestions: fetchSalesReps,
+          autofill: {
+            repCode: "repCode",
+            username: "repName",
+          },
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "username",
+          label: "Username",
+          type: "text",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "usernameAutoGenerated",
+          label: "Auto Generated Username(Secured)",
+          type: "text",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "password",
+          label: "Login Password (Should Include Number/ Special Character)",
+          type: "password",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "imei",
+          label: "IMEI",
+          type: "text",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "locationCode",
+          label: "Item Location",
+          type: "autocomplete",
+          fetchSuggestions: fetchLocations,
+          autofill: {
+            locationCode: "locationCode",
+          },
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "invoice",
+          label: "Invoice",
+          type: "checkbox",
+          className: "col-span-12",
+        },
+        {
+          name: "order",
+          label: "Order",
+          type: "checkbox",
+          className: "col-span-12",
+        },
+        {
+          name: "quotation",
+          label: "Quotation",
+          type: "checkbox",
+          className: "col-span-12",
+        },
+        {
+          name: "invoiceOrderQuotation",
+          label: "Invoice / Order /Quotation",
+          type: "checkbox",
+          className: "col-span-12",
+        },
+      ],
+    },
+    salesReport: {
+      title: "Sales Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    stockReport: {
+      title: "Stock Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    customerReport: {
+      title: "Customer Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    orderReport: {
+      title: "Order Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    returnsReport: {
+      title: "Returns Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    debtorsReport: {
+      title: "Debtor Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    salesmanReport: {
+      title: "Salesman Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    generalAccountsReport: {
+      title: "General Account Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
+    },
+    otherReports: {
+      title: "Other Report",
+      useTabs: false,
+      fields: [
+        {
+          name: "fromDate",
+          label: "From Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+        {
+          name: "toDate",
+          label: "To Date",
+          type: "date",
+          className: "col-span-12 md:col-span-6",
+        },
+      ],
     },
   };
 

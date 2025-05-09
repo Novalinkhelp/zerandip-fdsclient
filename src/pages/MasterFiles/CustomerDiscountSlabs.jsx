@@ -41,7 +41,7 @@ const CustomerDiscountSlabs = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [searchQuery]);
@@ -51,12 +51,15 @@ const CustomerDiscountSlabs = () => {
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-  }
+  };
 
   const handleAdd = (newSlab) => {
-    setCustomerDiscountSlabs([...customerDiscountSlabs, { ...newSlab, id: Date.now() }]);
+    setCustomerDiscountSlabs([
+      ...customerDiscountSlabs,
+      { ...newSlab, id: Date.now() },
+    ]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedSlab) => {
     setCustomerDiscountSlabs(
@@ -65,14 +68,16 @@ const CustomerDiscountSlabs = () => {
       )
     );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
     setCustomerDiscountSlabs(
-      customerDiscountSlabs.filter((slab) => slab.id !== deleteModal.modalData.id)
+      customerDiscountSlabs.filter(
+        (slab) => slab.id !== deleteModal.modalData.id
+      )
     );
     deleteModal.closeModal();
-  }
+  };
 
   const columns = [
     {
@@ -85,7 +90,9 @@ const CustomerDiscountSlabs = () => {
     {
       key: "customerName",
       header: "Customer Name",
-      render: (item) => <span className="text-gray-800">{item.customerName}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.customerName}</span>
+      ),
     },
     {
       key: "active",
@@ -109,15 +116,16 @@ const CustomerDiscountSlabs = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}
@@ -192,7 +200,9 @@ const CustomerDiscountSlabs = () => {
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading customer discount slabs...</p>
+            <p className="mt-4 text-gray-600">
+              Loading customer discount slabs...
+            </p>
           </div>
         ) : error ? (
           <div className="p-8 text-center">

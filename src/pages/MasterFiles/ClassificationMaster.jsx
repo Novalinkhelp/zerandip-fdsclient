@@ -31,7 +31,9 @@ const ClassificationMaster = () => {
         setLoading(true);
         const data = await fetchClassifications(searchQuery);
         const validData = data.filter(
-          (classification) => classification.classificationCode && classification.classificationDescription
+          (classification) =>
+            classification.classificationCode &&
+            classification.classificationDescription
         );
         setClassifications(validData);
         setError(null);
@@ -41,48 +43,62 @@ const ClassificationMaster = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
-  }, [searchQuery])
+  }, [searchQuery]);
 
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const closeAllDropdowns = () => setOpenDropdownId(null);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-  }
+  };
 
   const handleAdd = (newClassification) => {
-    setClassifications([...classifications, { ...newClassification, id: Date.now() }]);
+    setClassifications([
+      ...classifications,
+      { ...newClassification, id: Date.now() },
+    ]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedClassification) => {
     setClassifications(
       classifications.map((classification) =>
-        classification.id === updatedClassification.id ? updatedClassification : classification
-      ));
+        classification.id === updatedClassification.id
+          ? updatedClassification
+          : classification
+      )
+    );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
-    setClassifications(classifications.filter((classification) => classification.id !== deleteModal.modalData.id));
+    setClassifications(
+      classifications.filter(
+        (classification) => classification.id !== deleteModal.modalData.id
+      )
+    );
     deleteModal.closeModal();
-  }
+  };
 
   const columns = [
     {
       key: "classificationCode",
       header: "Classification Code",
       render: (item) => (
-        <span className="font-medium text-gray-900">{item.classificationCode}</span>
+        <span className="font-medium text-gray-900">
+          {item.classificationCode}
+        </span>
       ),
     },
     {
       key: "classificationDescription",
       header: "Classification Description",
-      render: (item) => <span className="text-gray-800">{item.classificationDescription}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.classificationDescription}</span>
+      ),
     },
     {
       key: "actions",
@@ -101,15 +117,16 @@ const ClassificationMaster = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}

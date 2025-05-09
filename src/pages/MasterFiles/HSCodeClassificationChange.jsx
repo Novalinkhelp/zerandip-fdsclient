@@ -18,7 +18,7 @@ const HSCodeClassificationChange = () => {
       palRate: "30 → 25",
       ssclRate: "15 → 12",
       eicKgRate: "5.25 → 4.5",
-      vat: "16 → 16"
+      vat: "16 → 16",
     },
     {
       id: 2,
@@ -28,7 +28,7 @@ const HSCodeClassificationChange = () => {
       palRate: "25 → 20",
       ssclRate: "10 → 8",
       eicKgRate: "4.75 → 4.0",
-      vat: "16 → 14"
+      vat: "16 → 14",
     },
     {
       id: 3,
@@ -38,7 +38,7 @@ const HSCodeClassificationChange = () => {
       palRate: "20 → 18",
       ssclRate: "12 → 10",
       eicKgRate: "3.5 → 3.0",
-      vat: "16 → 16"
+      vat: "16 → 16",
     },
     {
       id: 4,
@@ -48,7 +48,7 @@ const HSCodeClassificationChange = () => {
       palRate: "25 → 25",
       ssclRate: "12 → 15",
       eicKgRate: "4.25 → 4.5",
-      vat: "16 → 16"
+      vat: "16 → 16",
     },
     {
       id: 5,
@@ -58,7 +58,7 @@ const HSCodeClassificationChange = () => {
       palRate: "20 → 22",
       ssclRate: "10 → 12",
       eicKgRate: "3.75 → 4.0",
-      vat: "16 → 16"
+      vat: "16 → 16",
     },
     {
       id: 6,
@@ -68,7 +68,7 @@ const HSCodeClassificationChange = () => {
       palRate: "30 → 25",
       ssclRate: "15 → 12",
       eicKgRate: "4.5 → 4.0",
-      vat: "16 → 16"
+      vat: "16 → 16",
     },
     {
       id: 7,
@@ -78,7 +78,7 @@ const HSCodeClassificationChange = () => {
       palRate: "25 → 22",
       ssclRate: "12 → 10",
       eicKgRate: "3.5 → 3.2",
-      vat: "16 → 14"
+      vat: "16 → 14",
     },
     {
       id: 8,
@@ -88,8 +88,8 @@ const HSCodeClassificationChange = () => {
       palRate: "25 → 25",
       ssclRate: "15 → 12",
       eicKgRate: "4.0 → 3.8",
-      vat: "16 → 16"
-    }
+      vat: "16 → 16",
+    },
   ]);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -107,7 +107,9 @@ const HSCodeClassificationChange = () => {
         break;
       case "delete":
         if (window.confirm(`Delete ${hsCodeChange.name}?`)) {
-          setHsCodeChanges(hsCodeChanges.filter((c) => c.id !== hsCodeChange.id));
+          setHsCodeChanges(
+            hsCodeChanges.filter((c) => c.id !== hsCodeChange.id)
+          );
         }
         break;
       default:
@@ -131,7 +133,9 @@ const HSCodeClassificationChange = () => {
     {
       key: "description",
       header: "Description",
-      render: (item) => <span className="text-gray-600">{item.description}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.description}</span>
+      ),
     },
     {
       key: "pal-rate",
@@ -170,15 +174,16 @@ const HSCodeClassificationChange = () => {
 
           {activeDropdown === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => handleAction("view", item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => handleAction("edit", item)}

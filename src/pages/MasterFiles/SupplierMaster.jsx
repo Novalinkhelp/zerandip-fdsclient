@@ -32,7 +32,7 @@ const SupplierMaster = () => {
         const data = await fetchSuppliers(searchQuery);
         const validData = data.filter(
           (item) => item.supplierCode && item.supplierName
-        )
+        );
         setSuppliers(validData);
         setError(null);
       } catch (error) {
@@ -41,37 +41,37 @@ const SupplierMaster = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [searchQuery]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-  }
+  };
 
   const [openDropdownId, setOpenDropdownId] = useState(null);
-  const closeAllDropdowns = () => setOpenDropdownId(null)
+  const closeAllDropdowns = () => setOpenDropdownId(null);
 
   const handleAdd = (newSupplier) => {
-    setSuppliers([...suppliers, { ...newSupplier, id: Date.now() }])
+    setSuppliers([...suppliers, { ...newSupplier, id: Date.now() }]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedSupplier) => {
     setSuppliers(
-      suppliers.map((supplier) => (
+      suppliers.map((supplier) =>
         supplier.id === updatedSupplier.id ? updatedSupplier : supplier
-      ))
+      )
     );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
     setSuppliers(
       suppliers.filter((supplier) => supplier.id !== deleteModal.modalData.id)
-    )
-  }
+    );
+  };
 
   const columns = [
     {
@@ -84,12 +84,16 @@ const SupplierMaster = () => {
     {
       key: "supplierName",
       header: "Supplier Name",
-      render: (item) => <span className="text-gray-800">{item.supplierName}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.supplierName}</span>
+      ),
     },
     {
       key: "supplierType",
       header: "Type",
-      render: (item) => <span className="text-gray-600">{item.supplierType}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.supplierType}</span>
+      ),
     },
     {
       key: "actions",
@@ -108,15 +112,16 @@ const SupplierMaster = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}
@@ -162,7 +167,8 @@ const SupplierMaster = () => {
               <Download className="h-4 w-4 mr-2" />
               Export
             </button>
-            <button className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+            <button
+              className="flex items-center justify-center max-xs:w-full px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
               onClick={() => addModal.openModal()}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -187,27 +193,24 @@ const SupplierMaster = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        {
-          loading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading suppliers...</p>
-            </div>
-          )
-            : error ? (
-              <div className="p-8 text-center">
-                <p className="text-red-600">{error}</p>
-              </div>
-            ) : (
-              <Table
-                data={suppliers}
-                columns={columns}
-                currentPage={1}
-                totalPages={2}
-                onPageChange={(page) => console.log(`Page changed to ${page}`)}
-              />
-            )
-        }
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading suppliers...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : (
+          <Table
+            data={suppliers}
+            columns={columns}
+            currentPage={1}
+            totalPages={2}
+            onPageChange={(page) => console.log(`Page changed to ${page}`)}
+          />
+        )}
       </div>
 
       <AddModal
@@ -239,7 +242,6 @@ const SupplierMaster = () => {
         recordName="supplier"
         identifier={deleteModal.modalData?.supplierName || ""}
       />
-
     </div>
   );
 };

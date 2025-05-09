@@ -32,7 +32,7 @@ const UtilityMaster = () => {
         const data = await fetchUtilities(searchQuery);
         const validData = data.filter(
           (utility) => utility.expenseReferenceNumber && utility.expenseCode
-        )
+        );
         setUtilities(validData);
         setError(null);
       } catch (error) {
@@ -41,36 +41,38 @@ const UtilityMaster = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
-  }, [searchQuery])
+  }, [searchQuery]);
 
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const closeAllDropdowns = () => setOpenDropdownId(null);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-  }
+  };
 
   const handleAdd = (newUtility) => {
     setUtilities([...utilities, { ...newUtility, id: Date.now() }]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedUtility) => {
     setUtilities(
       utilities.map((utility) =>
         utility.id === updatedUtility.id ? updatedUtility : utility
-      ))
+      )
+    );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
-    setUtilities(utilities.filter((utility) => utility.id !== deleteModal.modalData.id))
+    setUtilities(
+      utilities.filter((utility) => utility.id !== deleteModal.modalData.id)
+    );
     deleteModal.closeModal();
-  }
-
+  };
 
   const columns = [
     {
@@ -83,12 +85,16 @@ const UtilityMaster = () => {
     {
       key: "expenseReferenceNumber",
       header: "Expense Reference No",
-      render: (item) => <span className="text-gray-800">{item.expenseReferenceNumber}</span>,
+      render: (item) => (
+        <span className="text-gray-800">{item.expenseReferenceNumber}</span>
+      ),
     },
     {
       key: "description",
       header: "Description",
-      render: (item) => <span className="text-gray-600">{item.description}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.description}</span>
+      ),
     },
     {
       key: "period",
@@ -117,15 +123,16 @@ const UtilityMaster = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}

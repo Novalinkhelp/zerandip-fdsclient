@@ -29,9 +29,7 @@ const SalesRepMaster = () => {
       try {
         setLoading(true);
         const data = await fetchSalesReps(searchQuery);
-        const validData = data.filter(
-          (rep) => rep.repCode && rep.repName
-        )
+        const validData = data.filter((rep) => rep.repCode && rep.repName);
         setSalesReps(validData);
         setError(null);
       } catch (error) {
@@ -40,7 +38,7 @@ const SalesRepMaster = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [searchQuery]);
@@ -50,24 +48,28 @@ const SalesRepMaster = () => {
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-  }
+  };
 
   const handleAdd = (newSalesRep) => {
     setSalesReps([...salesReps, { ...newSalesRep, id: Date.now() }]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedSalesRep) => {
     setSalesReps(
-      salesReps.map((rep) => (rep.id === updatedSalesRep.id ? updatedSalesRep : rep))
+      salesReps.map((rep) =>
+        rep.id === updatedSalesRep.id ? updatedSalesRep : rep
+      )
     );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
-    setSalesReps(salesReps.filter((rep) => rep.id !== deleteModal.modalData.id));
+    setSalesReps(
+      salesReps.filter((rep) => rep.id !== deleteModal.modalData.id)
+    );
     deleteModal.closeModal();
-  }
+  };
 
   const columns = [
     {
@@ -90,7 +92,9 @@ const SalesRepMaster = () => {
     {
       key: "monthlyTarget",
       header: "Monthly Target",
-      render: (item) => <span className="text-gray-600">{item.monthlyTarget}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.monthlyTarget}</span>
+      ),
     },
     {
       key: "actions",
@@ -109,15 +113,16 @@ const SalesRepMaster = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}

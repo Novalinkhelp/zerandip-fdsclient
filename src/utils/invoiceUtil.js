@@ -25,11 +25,13 @@ export const generateInvoiceNumbers = () => {
   const referenceNumber = `REF-${timeStamp}-${randomNumber}`;
   const orderNumber = `ORD-${formattedDate}-${randomNumber}`;
   const quotationNumber = `QTN-${timeStamp}-${randomNumber}`;
+  const receiptNumber = `RCT-${formattedDate}-${randomNumber}`;
 
   return {
     invoiceNumber,
     referenceNumber,
     orderNumber,
     quotationNumber,
+    receiptNumber,
   };
 };

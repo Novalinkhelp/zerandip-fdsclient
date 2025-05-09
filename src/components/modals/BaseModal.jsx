@@ -24,9 +24,7 @@ const BaseModal = ({
             <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
           </button>
         </div>
-        <div className="px-7 py-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto px-7 py-6">{children}</div>
       </div>
     </div>
   );

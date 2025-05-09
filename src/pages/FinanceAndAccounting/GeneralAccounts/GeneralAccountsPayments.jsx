@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAutofill from "../../../hooks/useAutofill";
 import { getFormConfig } from "../../../utils/formConfig";
 import DynamicForm from "../../../components/forms/DynamicForm";
@@ -6,12 +6,20 @@ import Table from "../../../components/table/Table";
 import { Plus } from "lucide-react";
 
 const GeneralAccountPayments = () => {
-  const { bankDepositCash, bankDepositCheque, normalPayment } = getFormConfig(
+  const { bankDepositCash, bankDepositCheque, normalPayment, normalChequePayment } = getFormConfig(
     "generalAccountsPayments"
   );
   const [paymentField, setPaymentFields] = useState(bankDepositCash.fields);
   const [paymentInformation, setPaymentInformation] = useState({});
   const [payments, setPayments] = useState([]);
+
+  useEffect(() => {
+    setPaymentInformation((prev) => ({
+      ...prev,
+      paymentType: "N",
+      modeOfPayment: "C"
+    }))
+  }, []);
 
   const currentConfig = {
     fields: paymentField,
@@ -69,11 +77,17 @@ const GeneralAccountPayments = () => {
 
   const handlePaymentInformationChange = (formData) => {
     if (formData.paymentType === "N") {
-      setPaymentFields(normalPayment.fields);
+      if (formData.modeOfPayment === "C") {
+        setPaymentFields(normalPayment.fields);
+      } else {
+        setPaymentFields(normalChequePayment.fields);
+      }
     }
 
     if (formData.modeOfPayment === "Q" && formData.paymentType === "B") {
       setPaymentFields(bankDepositCheque.fields);
+    } else if (formData.modeOfPayment === "C" && formData.paymentType === "B") {
+      setPaymentFields(bankDepositCash.fields);
     }
 
     setPaymentInformation(formData);

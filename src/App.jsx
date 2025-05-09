@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from "react-router";
+import { HashRouter as Router, Routes, Route, Navigate } from "react-router";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import MasterDataManagement from "./pages/MasterFiles/MasterDataManagement";
 import Dashboard from "./pages/Dashboard";
@@ -27,7 +27,7 @@ import CustomerDiscountSlabs from "./pages/MasterFiles/CustomerDiscountSlabs";
 import InventoryAndStockInquiry from "./pages/InventoryAndStock/InventoryAndStockInquiry";
 import SalesTransactions from "./pages/SalesTransactions/SalesTransactions";
 import LedgerDataManagement from "./pages/FinanceAndAccounting/LedgerDataManagement";
-import SalesRepVisit from "./pages/Schedules/SalesRepVisit";
+import SalesRepVisit from "./pages/FinanceAndAccounting/Schedules/SalesRepVisit";
 import RepWorkingSchedule from "./pages/FinanceAndAccounting/Schedules/RepWorkingSchedule";
 import DeliveryOutward from "./pages/FinanceAndAccounting/Deliveries/DeliveryOutward";
 import ChangeSellingPrice from "./pages/FinanceAndAccounting/Miscellaneous/ChangeSellingPrice";
@@ -44,6 +44,9 @@ import CustomerAccountsJournals from "./pages/FinanceAndAccounting/DebtorsLedger
 import GeneralAccountsPayments from "./pages/FinanceAndAccounting/GeneralAccounts/GeneralAccountsPayments";
 import StandardReceipts from "./pages/FinanceAndAccounting/DebtorsLedger/StandardReceipts";
 import GeneralAccountReceipts from "./pages/FinanceAndAccounting/GeneralAccounts/GeneralAccountReceipts";
+import UserSystemManagement from "./pages/UserSystemManagement/UserSystemManagement";
+import ReportsAndAnalytics from "./pages/ReportsAndAnalytics/ReportsAndAnalytics";
+
 
 function App() {
   return (
@@ -233,6 +236,24 @@ function App() {
           <Route
             path="/finance-accounting/debtors-ledger/cheque-details"
             element={<DebtorsLedgerCheques />}
+          />
+
+          {/* Handling redirection for undefined routes in general ledger */}
+          <Route
+            path="/finance-accounting/*"
+            element={<Navigate to="/finance-accounting" replace />}
+          />
+
+          {/* User System Management */}
+          <Route
+            path="/user-system-management"
+            element={<UserSystemManagement />}
+          />
+
+          {/* Reports and Analytics */}
+          <Route
+            path="/reports-analytics"
+            element={<ReportsAndAnalytics />}
           />
         </Route>
       </Routes>

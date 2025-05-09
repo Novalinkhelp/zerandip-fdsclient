@@ -17,7 +17,7 @@ const InvoiceMaster = () => {
       repName: "John Kamau",
       date: "2025-04-01",
       time: "09:15 AM",
-      invTotal: "KES 124,500"
+      invTotal: "KES 124,500",
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ const InvoiceMaster = () => {
       repName: "Sarah Odhiambo",
       date: "2025-04-02",
       time: "10:30 AM",
-      invTotal: "KES 78,200"
+      invTotal: "KES 78,200",
     },
     {
       id: 3,
@@ -35,7 +35,7 @@ const InvoiceMaster = () => {
       repName: "Daniel Mwangi",
       date: "2025-04-02",
       time: "02:45 PM",
-      invTotal: "KES 253,000"
+      invTotal: "KES 253,000",
     },
     {
       id: 4,
@@ -44,7 +44,7 @@ const InvoiceMaster = () => {
       repName: "Grace Okello",
       date: "2025-04-03",
       time: "11:20 AM",
-      invTotal: "UGX 4,250,000"
+      invTotal: "UGX 4,250,000",
     },
     {
       id: 5,
@@ -53,7 +53,7 @@ const InvoiceMaster = () => {
       repName: "Jean-Paul Kagame",
       date: "2025-04-04",
       time: "09:00 AM",
-      invTotal: "RWF 875,000"
+      invTotal: "RWF 875,000",
     },
     {
       id: 6,
@@ -62,7 +62,7 @@ const InvoiceMaster = () => {
       repName: "Amina Hassan",
       date: "2025-04-05",
       time: "03:15 PM",
-      invTotal: "TZS 5,450,000"
+      invTotal: "TZS 5,450,000",
     },
     {
       id: 7,
@@ -71,7 +71,7 @@ const InvoiceMaster = () => {
       repName: "David Otieno",
       date: "2025-04-06",
       time: "10:45 AM",
-      invTotal: "KES 94,300"
+      invTotal: "KES 94,300",
     },
     {
       id: 8,
@@ -80,8 +80,8 @@ const InvoiceMaster = () => {
       repName: "Ibrahim Mwanza",
       date: "2025-04-07",
       time: "01:30 PM",
-      invTotal: "TZS 2,750,000"
-    }
+      invTotal: "TZS 2,750,000",
+    },
   ]);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -157,15 +157,16 @@ const InvoiceMaster = () => {
 
           {activeDropdown === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => handleAction("view", item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => handleAction("edit", item)}

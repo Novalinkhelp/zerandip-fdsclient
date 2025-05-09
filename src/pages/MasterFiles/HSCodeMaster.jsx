@@ -41,7 +41,7 @@ const HSCodeMaster = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [searchQuery]);
@@ -56,7 +56,7 @@ const HSCodeMaster = () => {
   const handleAdd = (newHsCode) => {
     setHsCodes([...hsCodes, { ...newHsCode, id: Date.now() }]);
     addModal.closeModal();
-  }
+  };
 
   const handleEdit = (updatedHsCode) => {
     setHsCodes(
@@ -65,15 +65,14 @@ const HSCodeMaster = () => {
       )
     );
     editModal.closeModal();
-  }
+  };
 
   const handleDelete = () => {
     setHsCodes(
       hsCodes.filter((hsCode) => hsCode.id !== deleteModal.modalData.id)
     );
     deleteModal.closeModal();
-  }
-
+  };
 
   const columns = [
     {
@@ -91,7 +90,9 @@ const HSCodeMaster = () => {
     {
       key: "itemDescription",
       header: "Description",
-      render: (item) => <span className="text-gray-600">{item.itemDescription}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.itemDescription}</span>
+      ),
     },
     {
       key: "palRate",
@@ -111,7 +112,9 @@ const HSCodeMaster = () => {
     {
       key: "vatPercentage",
       header: "Vat Percentage(%)",
-      render: (item) => <span className="text-gray-600">{item.vatPercentage}</span>,
+      render: (item) => (
+        <span className="text-gray-600">{item.vatPercentage}</span>
+      ),
     },
     {
       key: "actions",
@@ -130,15 +133,16 @@ const HSCodeMaster = () => {
 
           {openDropdownId === item.id && (
             <div
-              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${index >= data.length - 2 ? "bottom-full" : "top-full"
-                }`}
+              className={`absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-lg bg-white py-1.5 shadow-sm border border-gray-200 animate-slideInDown ${
+                index >= data.length - 2 ? "bottom-full" : "top-full"
+              }`}
             >
               <div className="p-1">
                 <button
                   onClick={() => viewModal.openModal(item)}
                   className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150 cursor-pointer"
                 >
-                  <span className="flex-1 text-left">View Details</span>
+                  <span className="flex-1 text-left">View</span>
                 </button>
                 <button
                   onClick={() => editModal.openModal(item)}
@@ -260,7 +264,6 @@ const HSCodeMaster = () => {
         recordName="hsCode"
         identifier={deleteModal.modalData?.hsCodeNumber || ""}
       />
-
     </div>
   );
 };
