@@ -8,6 +8,8 @@ import Table from "../../components/table/Table";
 import useAutofill from "../../hooks/useAutofill";
 import { generateInvoiceNumbers } from "../../utils/invoiceUtil";
 import FormField from "../../components/forms/FormField";
+import useModal from "../../hooks/useModal";
+import InvoiceModal from "../../components/modals/InvoiceModal";
 
 const Quotation = () => {
   const { customer, invoice, item } = getFormConfig("quotation");
@@ -16,6 +18,8 @@ const Quotation = () => {
   const [itemInformation, setItemInformation] = useState({});
   const [confirmOrder, setConfirmOrder] = useState(false);
   const [items, setItems] = useState([]);
+
+  const invoiceModal = useModal();
 
   useEffect(() => {
     const { invoiceNumber, referenceNumber, orderNumber } =
@@ -27,6 +31,12 @@ const Quotation = () => {
       orderNumber,
     }));
   }, []);
+
+  const invoiceAutoSelect = useAutofill(
+    invoiceInformation,
+    setInvoiceInformation,
+    invoice
+  )
 
   const customerAutoSelect = useAutofill(
     customerInformation,
@@ -148,6 +158,22 @@ const Quotation = () => {
     setItemInformation({});
   };
 
+  const createSale = () => {
+    const salesData = {
+      customer: customerInformation,
+      invoice: invoiceInformation,
+      items: items,
+      salesSummary: totals
+    };
+
+    return salesData;
+  }
+
+  const handlePrint = () => {
+    const sale = createSale();
+    invoiceModal.openModal(sale);
+  }
+
   return (
     <div className="space-y-12">
       <div className="flex flex-col gap-4 p-6 bg-gray-50 rounded-2xl">
@@ -168,6 +194,7 @@ const Quotation = () => {
           fields={invoice.fields}
           values={invoiceInformation}
           onChange={setInvoiceInformation}
+          onAutocompleteSelect={invoiceAutoSelect.handleAutocompleteSelect}
         />
       </div>
 
@@ -238,7 +265,7 @@ const Quotation = () => {
             />
             <div className="flex flex-col md:flex-row gap-2 justify-end items-center w-full mt-4">
               <button
-                onClick={handleAddItem}
+                onClick={handlePrint}
                 className="w-full justify-center md:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 flex items-center cursor-pointer md:mr-3"
               >
                 <Printer className="h-4 w-4 mr-1.5" />
@@ -252,6 +279,18 @@ const Quotation = () => {
               </button>
             </div>
           </div>
+          <InvoiceModal
+            isOpen={invoiceModal.isOpen}
+            onClose={invoiceModal.closeModal}
+            transaction={invoiceModal.modalData}
+            typeOfTransaction="Quotation"
+            columns={columns}
+            width="max-w-5xl"
+            onSubmit={() => {
+              invoiceModal.closeModal();
+              handleResetInvoice();
+            }}
+          />
         </>
       )}
     </div>

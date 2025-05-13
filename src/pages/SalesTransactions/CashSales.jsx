@@ -3,9 +3,11 @@ import { getFormConfig } from "../../utils/formConfig";
 import { priceUtils } from "../../utils/priceUtils";
 import DynamicForm from "../../components/forms/DynamicForm";
 import InvoiceSummary from "../../components/sales-transactions/InvoiceSummary";
+import InvoiceModal from "../../components/modals/InvoiceModal";
 import { Eye, Printer, ShoppingCart, Trash2 } from "lucide-react";
 import Table from "../../components/table/Table";
 import useAutofill from "../../hooks/useAutofill";
+import useModal from "../../hooks/useModal";
 import { generateInvoiceNumbers } from "../../utils/invoiceUtil";
 
 const CashSales = () => {
@@ -15,6 +17,8 @@ const CashSales = () => {
   const [itemInformation, setItemInformation] = useState({});
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const invoiceModal = useModal();
 
   useEffect(() => {
     const { invoiceNumber, referenceNumber, orderNumber } =
@@ -137,6 +141,7 @@ const CashSales = () => {
       unitPrice: itemInformation.unitPrice,
       value: netValue,
     };
+
     setItems([...items, itemInformationWithValue]);
     setItemInformation({});
   };
@@ -192,6 +197,22 @@ const CashSales = () => {
     setItemInformation({});
     setSelectedItem(null);
   };
+
+  const createSale = () => {
+    const salesData = {
+      customer: customerInformation,
+      invoice: invoiceInformation,
+      items: items,
+      salesSummary: totals
+    };
+
+    return salesData;
+  }
+
+  const handlePreview = () => {
+    const sale = createSale();
+    invoiceModal.openModal(sale);
+  }
 
   return (
     <div className="space-y-12">
@@ -284,7 +305,7 @@ const CashSales = () => {
                 Print Invoice
               </button>
               <button
-                onClick={handleAddItem}
+                onClick={handlePreview}
                 className="w-full justify-center md:w-auto px-5 py-2.5 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500/30 flex items-center cursor-pointer md:mr-3"
               >
                 <Eye className="h-4 w-4 mr-1.5" />
@@ -298,8 +319,23 @@ const CashSales = () => {
               </button>
             </div>
           </div>
+
+          <InvoiceModal
+            isOpen={invoiceModal.isOpen}
+            onClose={invoiceModal.closeModal}
+            transaction={invoiceModal.modalData}
+            typeOfTransaction="Invoice"
+            salesType="Cash"
+            columns={columns}
+            width="max-w-5xl"
+            onSubmit={() => {
+              invoiceModal.closeModal();
+              handleResetInvoice();
+            }}
+          />
         </>
       )}
+
     </div>
   );
 };

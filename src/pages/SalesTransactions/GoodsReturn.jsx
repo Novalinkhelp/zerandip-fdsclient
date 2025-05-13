@@ -3,15 +3,19 @@ import { getFormConfig } from "../../utils/formConfig";
 import { priceUtils } from "../../utils/priceUtils";
 import DynamicForm from "../../components/forms/DynamicForm";
 import InvoiceSummary from "../../components/sales-transactions/InvoiceSummary";
-import { RefreshCw, ShoppingCart, Trash2 } from "lucide-react";
+import { CheckCircle, RefreshCw, ShoppingCart, Trash2 } from "lucide-react";
 import Table from "../../components/table/Table";
 import useAutofill from "../../hooks/useAutofill";
+import useModal from "../../hooks/useModal";
+import InvoiceModal from "../../components/modals/InvoiceModal";
 
 const GoodsReturn = () => {
   const { returnNote, item } = getFormConfig("goodsReturn");
   const [returnNoteInformation, setReturnNoteInformation] = useState({});
   const [itemInformation, setItemInformation] = useState({});
   const [items, setItems] = useState([]);
+
+  const invoiceModal = useModal();
 
   const returnNoteAutoSelect = useAutofill(
     returnNoteInformation,
@@ -97,6 +101,19 @@ const GoodsReturn = () => {
     },
   ];
 
+  const additionalButtons = [
+    {
+      label: "Confirm Return",
+      icon: <CheckCircle className="h-4 w-4 mr-1.5" />,
+      onClick: () => {
+        invoiceModal.closeModal();
+        handleResetInvoice();
+      },
+      className: "w-full justify-center md:w-auto px-5 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500/30 flex items-center cursor-pointer md:mr-3"
+
+    }
+  ]
+
   const handleItemFormChange = (formData) => {
     const updatedValues = { ...formData };
 
@@ -137,6 +154,21 @@ const GoodsReturn = () => {
   const handleItemReset = () => {
     setItemInformation({});
   };
+
+  const createReturnNote = () => {
+    const returnNote = {
+      invoice: returnNoteInformation,
+      items,
+      salesSummary: totals
+    }
+
+    return returnNote;
+  }
+
+  const handleReturn = () => {
+    const returnNote = createReturnNote();
+    invoiceModal.openModal(returnNote);
+  }
 
   return (
     <div className="space-y-12">
@@ -205,7 +237,7 @@ const GoodsReturn = () => {
 
             <div className="flex flex-col md:flex-row gap-2 justify-end items-center w-full mt-4">
               <button
-                onClick={handleAddItem}
+                onClick={handleReturn}
                 className="w-full justify-center md:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 flex items-center cursor-pointer md:mr-3"
               >
                 <RefreshCw className="h-4 w-4 mr-1.5" />
@@ -219,9 +251,23 @@ const GoodsReturn = () => {
               </button>
             </div>
           </div>
+          <InvoiceModal
+            isOpen={invoiceModal.isOpen}
+            onClose={invoiceModal.closeModal}
+            transaction={invoiceModal.modalData}
+            typeOfTransaction="Return Note"
+            columns={columns}
+            width="max-w-5xl"
+            onSubmit={() => {
+              invoiceModal.closeModal();
+              handleResetInvoice();
+            }}
+            additionalButtons={additionalButtons}
+          />
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

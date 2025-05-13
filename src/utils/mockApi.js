@@ -10545,6 +10545,26 @@ export const fetchItems = async (query = "") => {
   );
 };
 
+export const fetchLowStockItems = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const lowStockItems = mockItems
+    .filter(
+      (item) =>
+        item.rsQuantityInHand < item.minimumStockQuantity ||
+        item.wsQuantityInHand < item.minimumStockQuantity
+    )
+    .map((item) => ({
+      itemCode: item.itemCode,
+      itemDescription: item.itemDescription,
+      rsQuantityInHand: item.rsQuantityInHand,
+      wsQuantityInHand: item.wsQuantityInHand,
+      minimumStockQuantity: item.minimumStockQuantity,
+    }));
+
+  return lowStockItems;
+};
+
 export const fetchLocationWiseItems = async (query = "") => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
